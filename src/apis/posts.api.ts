@@ -2,6 +2,7 @@ import { PLATFORM_TYPE } from '@/constants'
 import http from '@/utils/http'
 
 import { CreatePostRequest, Post } from '@/types/post'
+import { SuccessResponse } from '@/types/utils'
 
 export type GetPostsParams = {
   platform: (typeof PLATFORM_TYPE)[keyof typeof PLATFORM_TYPE]
@@ -11,7 +12,7 @@ export type GetPostsParams = {
 
 const postApi = {
   getPosts(params?: GetPostsParams) {
-    return http.get<Post[]>('/posts', { params })
+    return http.get<SuccessResponse<Post[]>>('/posts', { params })
   },
   createPost(data: CreatePostRequest) {
     return http.post('/schedule', data)

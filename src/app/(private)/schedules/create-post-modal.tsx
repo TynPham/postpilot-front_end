@@ -257,19 +257,12 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                           </FormControl>
                           <div className='flex items-center gap-2'>
                             <Avatar className='size-8'>
-                              <AvatarImage
-                                src={
-                                  credential.metadata?.picture?.url ||
-                                  credential.credential?.threads_profile_picture_url
-                                }
-                              />
+                              <AvatarImage src={credential.metadata.avatar_url} />
                               <AvatarFallback>
                                 <FaFacebook className='size-4' />
                               </AvatarFallback>
                             </Avatar>
-                            <FormLabel className='font-normal cursor-pointer'>
-                              {credential.credential?.page_name || credential.credential?.username}
-                            </FormLabel>
+                            <FormLabel className='font-normal cursor-pointer'>{credential.metadata.name}</FormLabel>
                           </div>
                         </FormItem>
                       )}
@@ -433,10 +426,10 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                   <CardHeader className='pb-2'>
                     <div className='flex items-center gap-2'>
                       <Avatar className='size-8 bg-orange-500'>
-                        <AvatarFallback>{credentials[0]?.credential?.page_name?.charAt(0) || 'A'}</AvatarFallback>
+                        <AvatarFallback>{credentials[0]?.metadata?.name?.charAt(0) || 'A'}</AvatarFallback>
                       </Avatar>
                       <div className='flex flex-col'>
-                        <span className='text-sm font-semibold'>{credentials[0]?.credential.page_name || 'Admin'}</span>
+                        <span className='text-sm font-semibold'>{credentials[0]?.metadata.name || 'Admin'}</span>
                         <span className='text-xs text-muted-foreground'>{preview.time}</span>
                       </div>
                     </div>
