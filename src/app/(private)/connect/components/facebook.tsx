@@ -71,15 +71,16 @@ export default function FacebookSdk({ refetch, btnText }: Props) {
       window.FB.login(
         (response: any) => {
           if (response.authResponse) {
+            const authResponse = response.authResponse
             getPages()
               .then(async (response) => {
-                console.log(response)
                 const pageData = response.data
                 if (pageData.length > 0) {
                   const body = pageData.map((item: any) => ({
                     platform: 'facebook',
+                    socialOwnerId: authResponse.userID,
                     socialId: item.id,
-                    credential: {
+                    credentials: {
                       page_id: item.id,
                       code: item.access_token
                     },

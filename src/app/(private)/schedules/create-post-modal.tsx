@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { PostType } from '@/constants/post'
 import { useAppContext } from '@/contexts/app-context'
+import { useUploadImagesMutation } from '@/queries/media'
 import { useCreatePostMutation } from '@/queries/post'
 import { postSchema, PostSchema } from '@/schema-validations/post'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -114,6 +115,8 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
 
   const createPostMutation = useCreatePostMutation()
 
+  const uploadImagesMutation = useUploadImagesMutation()
+
   const handleScheduleAll = (checked: boolean) => {
     form.setValue('scheduleAll', checked)
     if (checked) {
@@ -127,7 +130,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
   }
 
   async function onSubmit(data: PostSchema) {
-    if (createPostMutation.isPending) return
+    if (createPostMutation.isPending || uploadImagesMutation.isPending) return
     if (form.getValues('selectedPages')?.length === 0) {
       toast({
         title: 'Error',
@@ -145,6 +148,10 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
     try {
       const scheduledDate = moment(data.scheduledDate).format('YYYY-MM-DD')
 
+      const files = data.images?.map((image) => image.file)
+
+      const uploadImagesResponse = await uploadImagesMutation.mutateAsync(files as File[])
+
       const body: CreatePostRequest = {
         publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
         socialPosts: credentials
@@ -157,9 +164,9 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
               type: credential.platform === 'facebook' ? data.type : 'carousel',
               content: data.description,
               assets:
-                data.images?.map(() => ({
-                  type: 'image',
-                  url: 'https://plus.unsplash.com/premium_photo-1706559780094-648dbe2b2bd0?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
+                uploadImagesResponse.data.data.map((image) => ({
+                  type: image.type,
+                  url: image.url
                 })) || []
             }
           }))
@@ -409,9 +416,11 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                   <Button variant='outline' onClick={() => setOpen(false)}>
                     Cancel
                   </Button>
-                  <Button disabled={createPostMutation.isPending} type='submit'>
-                    {createPostMutation.isPending ? 'Scheduling...' : 'Schedule Post'}
-                    {createPostMutation.isPending && <Loader2 className='size-4 animate-spin' />}
+                  <Button disabled={createPostMutation.isPending || uploadImagesMutation.isPending} type='submit'>
+                    {createPostMutation.isPending || uploadImagesMutation.isPending ? 'Scheduling...' : 'Schedule Post'}
+                    {(createPostMutation.isPending || uploadImagesMutation.isPending) && (
+                      <Loader2 className='size-4 animate-spin' />
+                    )}
                   </Button>
                 </div>
               </div>
