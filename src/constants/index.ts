@@ -51,13 +51,12 @@ export const SIDE_BAR = {
 }
 
 export const PLATFORM_COLORS = {
-  FACEBOOK: '#1877F2',
-  THREADS: '#000000',
-  INSTAGRAM: '#C13584',
-  REDDIT: '#FF4500',
-  TWITTER: '#1DA1F2'
+  FACEBOOK: '--facebook',
+  THREADS: '--threads',
+  INSTAGRAM: '--instagram',
+  REDDIT: '--reddit',
+  TWITTER: '--twitter'
 }
-
 export const PLATFORM_TYPE = {
   FACEBOOK: 'facebook',
   INSTAGRAM: 'instagram',
