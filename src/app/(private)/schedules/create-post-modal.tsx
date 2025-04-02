@@ -413,17 +413,21 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
                   />
                 </div>
 
-                <div className='flex justify-end gap-4'>
-                  <Button variant='outline' onClick={() => setOpen(false)}>
-                    Cancel
-                  </Button>
-                  <Button disabled={createPostMutation.isPending || uploadImagesMutation.isPending} type='submit'>
-                    {createPostMutation.isPending || uploadImagesMutation.isPending ? 'Scheduling...' : 'Schedule Post'}
-                    {(createPostMutation.isPending || uploadImagesMutation.isPending) && (
-                      <Loader2 className='size-4 animate-spin' />
-                    )}
-                  </Button>
-                </div>
+                {((post && post.status === 'scheduled') || !post) && (
+                  <div className='flex justify-end gap-4'>
+                    <Button variant='outline' onClick={() => setOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button disabled={createPostMutation.isPending || uploadImagesMutation.isPending} type='submit'>
+                      {createPostMutation.isPending || uploadImagesMutation.isPending
+                        ? 'Scheduling...'
+                        : 'Schedule Post'}
+                      {(createPostMutation.isPending || uploadImagesMutation.isPending) && (
+                        <Loader2 className='size-4 animate-spin' />
+                      )}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
 

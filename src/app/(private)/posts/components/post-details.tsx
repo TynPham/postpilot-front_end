@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp } from 'lucide-react'
 
 import { Post } from '@/types/post'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -75,16 +76,29 @@ export default function PostDetails({ post }: PostDetailsProps) {
 
                 <PostDetailsListImage images={post?.metadata?.assets ?? []} />
 
-                <div className='flex items-center gap-4 pt-6 border-t'>
-                  <Button variant='outline' className='flex-1'>
+                {post?.publishedPost?.metadata?.likes?.length > 0 && (
+                  <div className='pt-2 pb-1'>
+                    <p className='text-xs flex gap-1 items-center'>
+                      <ThumbsUp className='size-3' />
+                      <span className='italic'>{post?.publishedPost?.metadata?.likes[0].name}</span>{' '}
+                      {post?.publishedPost?.metadata?.likes.length === 1 && 'and others'}
+                    </p>
+                  </div>
+                )}
+
+                <div className={cn('flex items-center gap-4 pt-2 border-t')}>
+                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
                     <ThumbsUp className='mr-2 size-4' />
                     Like
+                    <Badge variant='outline' className='ml-2 rounded-md'>
+                      {post?.publishedPost?.metadata?.likes?.length ?? 0}
+                    </Badge>
                   </Button>
-                  <Button variant='outline' className='flex-1'>
+                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
                     <MessageCircle className='mr-2 size-4' />
                     Comment
                   </Button>
-                  <Button variant='outline' className='flex-1'>
+                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
                     <Share2 className='mr-2 size-4' />
                     Share
                   </Button>

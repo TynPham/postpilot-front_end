@@ -1,11 +1,16 @@
 import path from '@/constants/path'
-import { CalendarCheck, CreditCard, FileText, Settings2 } from 'lucide-react'
+import { CalendarCheck, CreditCard, FileText, LayoutDashboard, Settings2 } from 'lucide-react'
 import { FaFacebook, FaInstagram, FaReddit, FaUserPlus } from 'react-icons/fa'
 import { FaThreads } from 'react-icons/fa6'
 import { RiTwitterXLine } from 'react-icons/ri'
 
 export const SIDE_BAR = {
   navMain: [
+    {
+      title: 'dashboard',
+      url: path.dashboard,
+      icon: LayoutDashboard
+    },
     {
       title: 'schedules',
       url: path.schedules,
