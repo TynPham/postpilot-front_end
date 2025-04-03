@@ -41,6 +41,11 @@ export const SIDE_BAR = {
           title: 'X',
           url: path.posts_x,
           icon: RiTwitterXLine
+        },
+        {
+          title: 'Instagram',
+          url: path.posts_instagram,
+          icon: FaInstagram
         }
       ]
     },

@@ -9,6 +9,7 @@ const path = {
   posts_threads: '/posts/threads',
   posts_reddit: '/posts/reddit',
   posts_x: '/posts/x',
+  posts_instagram: '/posts/instagram',
   connect: '/connect',
   settings: '/settings',
   subscription: '/subscription',
