@@ -80,7 +80,8 @@ export const PLATFORM_ICONS = {
   FACEBOOK: FaFacebook,
   INSTAGRAM: FaInstagram,
   REDDIT: FaReddit,
-  THREADS: FaThreads
+  THREADS: FaThreads,
+  X: RiTwitterXLine
 }
 
 export const DEFAULT_NUMBER_OF_SKELETON = 3

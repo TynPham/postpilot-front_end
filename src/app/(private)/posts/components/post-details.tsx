@@ -81,7 +81,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
                     <p className='text-xs flex gap-1 items-center'>
                       <ThumbsUp className='size-3' />
                       <span className='italic'>{post?.publishedPost?.metadata?.likes[0].name}</span>{' '}
-                      {post?.publishedPost?.metadata?.likes.length === 1 && 'and others'}
+                      {post?.publishedPost?.metadata?.likes.length > 1 && 'and others'}
                     </p>
                   </div>
                 )}
