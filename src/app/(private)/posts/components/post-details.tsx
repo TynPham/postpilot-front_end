@@ -22,6 +22,14 @@ export interface PostDetailsProps {
   post: Post
 }
 
+const platformColors: Record<string, string> = {
+  facebook: 'bg-gradient-to-r from-[#00c6ff] to-[#0072ff]',
+  x: 'bg-gradient-to-r from-[#1DA1F2] to-[#009ffc]',
+  threads: 'bg-gradient-to-r from-black via-gray-800 to-white',
+  instagram: 'bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045]',
+  reddit: 'bg-gradient-to-r from-[#ff4500] to-[#ffa500]'
+}
+
 export default function PostDetails({ post }: PostDetailsProps) {
   const pathname = usePathname()
   const platform = pathname.split('/')[2]
@@ -32,7 +40,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
         <div className='max-w-4xl mx-auto'>
           <ElementEffect animationProps={FADE_IN_ANIMATION}>
             <Link href={`/posts/${platform}`}>
-              <Button variant='ghost' className='mb-6 -ml-4 text-muted-foreground'>
+              <Button variant='default' className='mb-6'>
                 <ArrowLeft className='mr-2 size-4' />
                 Back to Posts
               </Button>
@@ -51,6 +59,9 @@ export default function PostDetails({ post }: PostDetailsProps) {
                     <div>
                       <h1 className='text-2xl font-bold'>{post?.socialCredential?.metadata.name}</h1>
                       <div className='flex items-center gap-2 mt-1'>
+                        <Badge className={cn('text-white border-none', platformColors[platform])}>
+                          {toCapitalize(platform)}
+                        </Badge>
                         <Badge variant='default'>{toCapitalize(post?.metadata.type)}</Badge>
                         <Badge variant='outline' className='capitalize'>
                           {post?.status}
@@ -87,18 +98,18 @@ export default function PostDetails({ post }: PostDetailsProps) {
                 )}
 
                 <div className={cn('flex items-center gap-4 pt-2 border-t')}>
-                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
+                  <Button variant='outline' className='flex-1'>
                     <ThumbsUp className='mr-2 size-4' />
                     Like
-                    <Badge variant='outline' className='ml-2 rounded-md'>
+                    <Badge variant='default' className='ml-2 rounded-md'>
                       {post?.publishedPost?.metadata?.likes?.length ?? 0}
                     </Badge>
                   </Button>
-                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
+                  <Button variant='outline' className='flex-1'>
                     <MessageCircle className='mr-2 size-4' />
                     Comment
                   </Button>
-                  <Button variant='outline' className='flex-1 hover:bg-muted/10'>
+                  <Button variant='outline' className='flex-1'>
                     <Share2 className='mr-2 size-4' />
                     Share
                   </Button>

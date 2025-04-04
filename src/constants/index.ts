@@ -68,11 +68,11 @@ export const SIDE_BAR = {
 }
 
 export const PLATFORM_COLORS = {
-  FACEBOOK: '--facebook',
-  THREADS: '--threads',
-  INSTAGRAM: '--instagram',
-  REDDIT: '--reddit',
-  X: '--x'
+  FACEBOOK: 'linear-gradient(to right, #00c6ff, #0072ff)',
+  THREADS: 'linear-gradient(to right, #000000, #55565B, #FFFFFF)',
+  INSTAGRAM: 'linear-gradient(to right, #833ab4, #fd1d1d, #fcb045)',
+  REDDIT: 'linear-gradient(to right, #ff4500, #ffa500)',
+  X: 'linear-gradient(to right, #1DA1F2, #009ffc)'
 }
 export const PLATFORM_TYPE = {
   FACEBOOK: 'facebook',

@@ -8,6 +8,7 @@ import { FaThreads } from 'react-icons/fa6'
 import { RiTwitterXLine } from 'react-icons/ri'
 
 import { Post } from '@/types/post'
+import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -17,6 +18,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BestPostingTimesChart } from './components/best-posting-times-chart'
 import { PlatformDistributionChart } from './components/platform-distribution-chart'
 import { PostPerformanceChart } from './components/post-performance-chart'
+
+const platformColors: Record<string, string> = {
+  facebook: 'bg-gradient-to-r from-[#00c6ff] to-[#0072ff]',
+  x: 'bg-gradient-to-r from-[#1DA1F2] to-[#009ffc]',
+  threads: 'bg-gradient-to-r from-black via-gray-800 to-white',
+  instagram: 'bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045]',
+  reddit: 'bg-gradient-to-r from-[#ff4500] to-[#ffa500]'
+}
 
 export default async function DashboardPage() {
   const cookieStores = await cookies()
@@ -51,7 +60,7 @@ export default async function DashboardPage() {
 
       {/* Stats Overview */}
       <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6'>
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
             <CardTitle className='text-sm font-medium '>Total Posts</CardTitle>
           </CardHeader>
@@ -69,9 +78,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
-            <CardTitle className='text-sm font-medium '>Engagement Rate</CardTitle>
+            <CardTitle className='text-sm font-medium'>Engagement Rate</CardTitle>
           </CardHeader>
           <CardContent>
             <div className='flex justify-between items-end'>
@@ -87,7 +96,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
             <CardTitle className='text-sm font-medium '>Scheduled Posts</CardTitle>
           </CardHeader>
@@ -105,7 +114,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader className='pb-2'>
             <CardTitle className='text-sm font-medium '>Avg. Reach</CardTitle>
           </CardHeader>
@@ -126,7 +135,7 @@ export default async function DashboardPage() {
 
       {/* Charts */}
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6'>
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader>
             <CardTitle>Post Performance</CardTitle>
             <CardDescription className=''>Post engagement over time</CardDescription>
@@ -136,7 +145,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className='border-foreground'>
+        <Card className='border-primary dark:border-primary/20 bg-muted/10'>
           <CardHeader>
             <CardTitle>Platform Distribution</CardTitle>
             <CardDescription className=''>Posts by social media platform</CardDescription>
@@ -148,7 +157,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Platform Performance */}
-      <Card className='border-foreground mb-6'>
+      <Card className='border-primary dark:border-primary/20 bg-muted/10 mb-6'>
         <CardHeader>
           <CardTitle>Platform Performance</CardTitle>
           <CardDescription className=''>Engagement metrics across different social media platforms</CardDescription>
@@ -156,8 +165,10 @@ export default async function DashboardPage() {
         <CardContent>
           <div className='space-y-4'>
             <div className='flex items-center'>
-              <div className='size-10 rounded-full bg-[rgb(var(--facebook))] flex items-center justify-center mr-4'>
-                <FaFacebook className='size-5 text-secondary' />
+              <div
+                className={cn('size-10 rounded-full flex items-center justify-center mr-4', platformColors.facebook)}
+              >
+                <FaFacebook className='size-5 text-white' />
               </div>
               <div className='flex-1'>
                 <div className='flex justify-between mb-1'>
@@ -165,14 +176,16 @@ export default async function DashboardPage() {
                   <span>78%</span>
                 </div>
                 <div className='w-full bg-gray-800 rounded-full h-2'>
-                  <div className='bg-[rgb(var(--facebook))] h-2 rounded-full' style={{ width: '78%' }}></div>
+                  <div className={cn('h-2 rounded-full', platformColors.facebook)} style={{ width: '78%' }}></div>
                 </div>
               </div>
             </div>
 
             <div className='flex items-center'>
-              <div className='size-10 rounded-full bg-[rgb(var(--instagram))] flex items-center justify-center mr-4'>
-                <FaInstagram className='size-5 text-secondary' />
+              <div
+                className={cn('size-10 rounded-full flex items-center justify-center mr-4', platformColors.instagram)}
+              >
+                <FaInstagram className='size-5 text-white' />
               </div>
               <div className='flex-1'>
                 <div className='flex justify-between mb-1'>
@@ -180,14 +193,14 @@ export default async function DashboardPage() {
                   <span>92%</span>
                 </div>
                 <div className='w-full bg-gray-800 rounded-full h-2'>
-                  <div className='bg-[rgb(var(--instagram))] h-2 rounded-full' style={{ width: '92%' }}></div>
+                  <div className={cn('h-2 rounded-full', platformColors.instagram)} style={{ width: '92%' }}></div>
                 </div>
               </div>
             </div>
 
             <div className='flex items-center'>
-              <div className='size-10 rounded-full bg-[rgb(var(--x))] flex items-center justify-center mr-4'>
-                <RiTwitterXLine className='size-5 text-secondary' />
+              <div className={cn('size-10 rounded-full flex items-center justify-center mr-4', platformColors.x)}>
+                <RiTwitterXLine className='size-5 text-white' />
               </div>
               <div className='flex-1'>
                 <div className='flex justify-between mb-1'>
@@ -195,14 +208,14 @@ export default async function DashboardPage() {
                   <span>64%</span>
                 </div>
                 <div className='w-full bg-gray-800 rounded-full h-2'>
-                  <div className='bg-[rgb(var(--x))] h-2 rounded-full' style={{ width: '64%' }}></div>
+                  <div className={cn('h-2 rounded-full', platformColors.x)} style={{ width: '64%' }}></div>
                 </div>
               </div>
             </div>
 
             <div className='flex items-center'>
-              <div className='size-10 rounded-full bg-[rgb(var(--threads))] flex items-center justify-center mr-4'>
-                <FaThreads className='size-5 text-secondary' />
+              <div className={cn('size-10 rounded-full flex items-center justify-center mr-4', platformColors.threads)}>
+                <FaThreads className='size-5 text-white' />
               </div>
               <div className='flex-1'>
                 <div className='flex justify-between mb-1'>
@@ -210,7 +223,7 @@ export default async function DashboardPage() {
                   <span>45%</span>
                 </div>
                 <div className='w-full bg-gray-800 rounded-full h-2'>
-                  <div className='bg-[rgb(var(--threads))] h-2 rounded-full' style={{ width: '45%' }}></div>
+                  <div className={cn('h-2 rounded-full', platformColors.threads)} style={{ width: '45%' }}></div>
                 </div>
               </div>
             </div>
@@ -219,7 +232,7 @@ export default async function DashboardPage() {
       </Card>
 
       {/* Best Posting Times */}
-      <Card className='border-foreground mb-6'>
+      <Card className='border-primary dark:border-primary/20 bg-muted/10 mb-6'>
         <CardHeader>
           <CardTitle>Best Posting Times</CardTitle>
           <CardDescription className=''>Engagement by time of day</CardDescription>
@@ -230,7 +243,7 @@ export default async function DashboardPage() {
       </Card>
 
       {/* Recent Posts */}
-      <Card className='border-foreground'>
+      <Card className='border-primary dark:border-primary/20 bg-muted/10'>
         <CardHeader>
           <div className='flex justify-between items-center'>
             <CardTitle>Recent Posts</CardTitle>
@@ -246,7 +259,7 @@ export default async function DashboardPage() {
                   <div className='mr-4 flex shrink-0'>
                     <Avatar>
                       <AvatarFallback>
-                        <PlatformIcon className='size-5' />
+                        <PlatformIcon className='size-5 text-white' />
                       </AvatarFallback>
                     </Avatar>
                   </div>
