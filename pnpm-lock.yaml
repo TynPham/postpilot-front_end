@@ -164,6 +164,9 @@ importers:
       tailwindcss-animate:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.17)
+      telegram-login-button:
+        specifier: ^0.1.0
+        version: 0.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       uuid:
         specifier: ^11.1.0
         version: 11.1.0
@@ -3491,6 +3494,12 @@ packages:
   tar@6.2.1:
     resolution: {integrity: sha512-DZ4yORTwrbTj/7MZYq2w+/ZFdI6OZ/f9SFHR+71gIVUZhOQPHzVCLpvRnPgyaMpfWxxk/4ONva3GQSyNIKRv6A==}
     engines: {node: '>=10'}
+
+  telegram-login-button@0.1.0:
+    resolution: {integrity: sha512-u8qaHmzHymaAvzisqddlUckKUS4Zo85z+pKZrrdLyRzVqmV4FHoDrCCIc7pokDlwVMSV/WTiyMMhRzG2dEnBpg==}
+    peerDependencies:
+      react: '>16.0.0'
+      react-dom: '>16.0.0'
 
   text-extensions@2.4.0:
     resolution: {integrity: sha512-te/NtwBwfiNRLf9Ijqx3T0nlqZiQ2XrrtBvu+cLL8ZRrGkO0NHTug8MYFKyoSrv/sHTaSKfilUkizV6XhxMJ3g==}
@@ -7258,6 +7267,13 @@ snapshots:
       minizlib: 2.1.2
       mkdirp: 1.0.4
       yallist: 4.0.0
+
+  telegram-login-button@0.1.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
+    dependencies:
+      '@babel/runtime': 7.26.0
+      prop-types: 15.8.1
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
 
   text-extensions@2.4.0: {}
 

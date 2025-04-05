@@ -6,7 +6,6 @@ const STATISTICAL_URI = '/statistical'
 
 const statisticalApi = {
   getStatisticalServer: (accessToken: string) =>
-     
     http.get<SuccessResponse<Statistical>>(STATISTICAL_URI, {
       headers: {
         Authorization: `Bearer ${accessToken}`

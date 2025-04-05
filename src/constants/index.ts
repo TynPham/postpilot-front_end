@@ -1,6 +1,6 @@
 import path from '@/constants/path'
 import { CalendarCheck, CreditCard, FileText, LayoutDashboard, Settings2 } from 'lucide-react'
-import { FaFacebook, FaInstagram, FaReddit, FaUserPlus } from 'react-icons/fa'
+import { FaFacebook, FaInstagram, FaReddit, FaRobot, FaUserPlus } from 'react-icons/fa'
 import { FaThreads } from 'react-icons/fa6'
 import { RiTwitterXLine } from 'react-icons/ri'
 
@@ -63,6 +63,11 @@ export const SIDE_BAR = {
       title: 'subscription',
       url: path.subscription,
       icon: CreditCard
+    },
+    {
+      title: 'bot',
+      url: path.bot,
+      icon: FaRobot
     }
   ]
 }

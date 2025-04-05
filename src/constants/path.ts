@@ -11,6 +11,7 @@ const path = {
   posts_x: '/posts/x',
   posts_instagram: '/posts/instagram',
   connect: '/connect',
+  bot: '/bot',
   settings: '/settings',
   subscription: '/subscription',
   waitlist: '/waitlist',
