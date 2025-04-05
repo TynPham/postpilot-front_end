@@ -1,33 +1,56 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import authApis from '@/apis/auth.api'
 import configs from '@/configs'
 import axios from 'axios'
 import { BellRing, MessageSquare, Users } from 'lucide-react'
 import { FaTelegram } from 'react-icons/fa'
 import TelegramLoginButton, { TelegramUser } from 'telegram-login-button'
 
+import { toast } from '@/hooks/use-toast'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 
 const BOT_NAME = configs.telegramBotName
 
 export default function ConnectPage() {
+  const [isLoading, setIsLoading] = useState<boolean>(false)
   const handleTelegramResponse = async (response: TelegramUser) => {
-    console.log(response)
+    if (isLoading) return
+    try {
+      setIsLoading(true)
+      const res = await authApis.connectTelegram({
+        telegramId: response.id,
+        username: response.username
+      })
+      if (res.data) {
+        toast({
+          title: 'Success',
+          description: res.data.message ?? 'Telegram connected successfully'
+        })
+      }
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to connect Telegram'
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
     <div className='flex flex-col gap-6 p-6'>
       <div className='flex items-center justify-between'>
-        <h1 className='text-2xl font-bold'>Connect Platforms</h1>
+        <h1 className='text-2xl font-bold'>Connect Bot</h1>
         <Button variant='outline'>
           <Users className='mr-2 size-4' />
-          Manage Connections
+          Manage Bot
         </Button>
       </div>
 
-      <div className='grid gap-6 md:grid-cols-3'>
+      <div className='max-w-[400px]'>
         <Card className=' hover:border-blue-600 transition-colors cursor-pointer h-full'>
           <CardHeader>
             <div className='flex items-center justify-between'>
@@ -48,55 +71,8 @@ export default function ConnectPage() {
             <TelegramLoginButton
               dataOnauth={handleTelegramResponse}
               botName={BOT_NAME}
-              dataAuthUrl='https://postpilot-front-end.vercel.app'
-              className='w-64 h-12 flex items-center justify-center rounded-md text-lg font-semibold focus:outline-none'
+              className='w-full h-12 flex items-center justify-center rounded-md text-lg font-semibold focus:outline-none'
             />
-          </CardFooter>
-        </Card>
-
-        <Card className=' hover:border-purple-600 transition-colors cursor-pointer'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <CardTitle className='flex items-center'>
-                <MessageSquare className='mr-2 size-5 text-purple-500' />
-                Discord
-              </CardTitle>
-              <span className='px-2 py-1 text-xs rounded-full bg-slate-500/20 text-slate-400'>Not Connected</span>
-            </div>
-            <CardDescription>Receive notifications via Discord</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className='text-sm '>
-              Connect your Discord server to receive notifications and manage your posts through Discord.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button variant='default' className='w-full'>
-              Connect
-            </Button>
-          </CardFooter>
-        </Card>
-
-        <Card className=' hover:border-orange-600 transition-colors cursor-pointer'>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <CardTitle className='flex items-center'>
-                <BellRing className='mr-2 size-5 text-orange-500' />
-                Slack
-              </CardTitle>
-              <span className='px-2 py-1 text-xs rounded-full bg-slate-500/20 text-slate-400'>Not Connected</span>
-            </div>
-            <CardDescription>Receive notifications via Slack</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <p className='text-sm '>
-              Connect your Slack workspace to receive notifications and collaborate with your team.
-            </p>
-          </CardContent>
-          <CardFooter>
-            <Button variant='default' className='w-full'>
-              Connect
-            </Button>
           </CardFooter>
         </Card>
       </div>
