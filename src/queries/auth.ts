@@ -1,5 +1,5 @@
 import authApis from '@/apis/auth.api'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 
 export const useAuthLogin = () => {
   return useMutation({
@@ -10,5 +10,12 @@ export const useAuthLogin = () => {
 export const useAuthLogout = () => {
   return useMutation({
     mutationFn: () => authApis.logout()
+  })
+}
+
+export const useGetTelegramStatus = () => {
+  return useQuery({
+    queryKey: ['telegram-status'],
+    queryFn: () => authApis.getTelegramStatus()
   })
 }
