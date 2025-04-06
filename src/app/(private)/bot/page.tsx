@@ -21,8 +21,12 @@ export default function ConnectPage() {
     try {
       setIsLoading(true)
       const res = await authApis.connectTelegram({
-        telegramId: response.id,
-        username: response.username
+        id: response.id,
+        first_name: response.first_name,
+        username: response.username,
+        photo_url: response.photo_url,
+        auth_date: response.auth_date,
+        hash: response.hash
       })
       if (res.data) {
         toast({
