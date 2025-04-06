@@ -58,7 +58,7 @@ export default function ConnectPage() {
                 <FaTelegram className='mr-2 size-7 text-blue-500' />
                 Telegram
               </CardTitle>
-              <span className='px-2 py-1 text-xs rounded-full bg-green-500/20 text-green-500'>Connected</span>
+              <span className='px-2 py-1 text-xs rounded-full bg-red-500/20 text-red-500'>Disconnected</span>
             </div>
             <CardDescription>Receive notifications via Telegram bot</CardDescription>
           </CardHeader>
