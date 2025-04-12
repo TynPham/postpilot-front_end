@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers'
 import statisticalApi from '@/apis/statistical.api'
 import { getIconPlatform, toCapitalize } from '@/utils/utils'
+import { format } from 'date-fns'
 import { ArrowDownRight, ArrowUpRight, BarChartIcon, Calendar, ChevronDown, FileText, Users } from 'lucide-react'
 import { IconType } from 'react-icons'
 import { FaFacebook, FaInstagram } from 'react-icons/fa'
@@ -67,7 +68,7 @@ export default async function DashboardPage() {
           <CardContent>
             <div className='flex justify-between items-end'>
               <div>
-                <div className='text-2xl font-bold'>1,248</div>
+                <div className='text-2xl font-bold'>{statisticalData.data.data.totalPosts}</div>
                 <div className='flex items-center text-xs text-green-500'>
                   <ArrowUpRight className='mr-1 size-3' />
                   <span>12% from last month</span>
@@ -270,7 +271,7 @@ export default async function DashboardPage() {
                     <Badge variant={post.status === 'scheduled' ? 'secondary' : 'default'}>
                       {toCapitalize(post.status)}
                     </Badge>
-                    <p className='text-xs'>{new Date(post.publicationTime).toLocaleDateString()}</p>
+                    <p className='text-xs'>{format(new Date(post.publicationTime), 'dd/MM/yyyy HH:mm')}</p>
                   </div>
                 </div>
               )
