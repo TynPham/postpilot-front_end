@@ -2,10 +2,10 @@ import { PostSchema } from '@/schema-validations/post'
 import { addMonths, format, isAfter, isBefore } from 'date-fns'
 import { Calendar, CalendarIcon, Upload } from 'lucide-react'
 import moment from 'moment'
+import { DateRange } from 'react-day-picker'
 import { UseFormReturn } from 'react-hook-form'
 
 import { cn } from '@/lib/utils'
-import { useRecurringSchedule } from '@/hooks/use-recurring-schedule'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Button } from '@/components/ui/button'
 import { Calendar as CalendarComponent } from '@/components/ui/calendar'
@@ -21,24 +21,10 @@ import AppInput from '@/components/app-input'
 
 interface FormPanelProps {
   form: UseFormReturn<PostSchema>
-  recurringSchedule: ReturnType<typeof useRecurringSchedule>
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
 }
 
-export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelProps) => {
-  const {
-    isRecurring,
-    setIsRecurring,
-    recurringType,
-    setRecurringType,
-    recurringDays,
-    setRecurringDays,
-    dateRange,
-    dateRangeOpen,
-    setDateRangeOpen,
-    handleDateRangeSelect
-  } = recurringSchedule
-
+export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
   const weekdays = [
     { value: 'monday', label: 'Monday' },
     { value: 'tuesday', label: 'Tuesday' },
@@ -48,6 +34,8 @@ export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelP
     { value: 'saturday', label: 'Saturday' },
     { value: 'sunday', label: 'Sunday' }
   ]
+
+  const isRecurring = form.watch('isRecurring')
 
   return (
     <div className='flex-1'>
@@ -152,8 +140,10 @@ export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelP
                           variant={'outline'}
                           className={cn(
                             'pl-3 text-left font-normal flex w-full',
-                            !field.value && 'text-muted-foreground'
+                            !field.value && 'text-muted-foreground',
+                            isRecurring && 'opacity-50 cursor-not-allowed'
                           )}
+                          disabled={isRecurring}
                         >
                           {field.value ? moment(field.value).format('MM/DD/YYYY') : 'Pick a date'}
                           <Calendar className='ml-auto size-4 opacity-50' />
@@ -170,6 +160,11 @@ export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelP
                       />
                     </PopoverContent>
                   </Popover>
+                  {isRecurring && (
+                    <p className='text-xs text-muted-foreground mt-1'>
+                      Scheduled date will be determined by regular posting schedule
+                    </p>
+                  )}
                   <FormMessage />
                 </FormItem>
               )}
@@ -185,7 +180,13 @@ export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelP
                       <Label htmlFor='recurring-toggle' className='text-sm'>
                         Recurring
                       </Label>
-                      <Switch id='recurring-toggle' checked={isRecurring} onCheckedChange={setIsRecurring} />
+                      <FormField
+                        control={form.control}
+                        name='isRecurring'
+                        render={({ field }) => (
+                          <Switch id='recurring-toggle' checked={field.value} onCheckedChange={field.onChange} />
+                        )}
+                      />
                     </div>
                   </FormLabel>
                   <FormControl>
@@ -198,100 +199,154 @@ export const FormPanel = ({ form, recurringSchedule, onImageUpload }: FormPanelP
           </div>
 
           {/* Recurring Schedule */}
-          {isRecurring && (
-            <div className='border rounded-md p-4 space-y-4'>
-              <Label className='text-sm font-medium block'>Recurring Schedule</Label>
+          <FormField
+            control={form.control}
+            name='isRecurring'
+            render={({ field }) => (
+              <div>
+                {field.value && (
+                  <div className='border rounded-md p-4 space-y-4'>
+                    <Label className='text-sm font-medium block'>Recurring Schedule</Label>
 
-              <RadioGroup value={recurringType} onValueChange={setRecurringType} className='space-y-2'>
-                <div className='flex items-center space-x-2'>
-                  <RadioGroupItem value='daily' id='daily' />
-                  <Label htmlFor='daily'>Daily</Label>
-                </div>
+                    <FormField
+                      control={form.control}
+                      name='recurringType'
+                      render={({ field }) => (
+                        <RadioGroup value={field.value} onValueChange={field.onChange} className='space-y-2'>
+                          <div className='flex items-center space-x-2'>
+                            <RadioGroupItem value='daily' id='daily' />
+                            <Label htmlFor='daily'>Daily</Label>
+                          </div>
 
-                <div className='flex items-center space-x-2'>
-                  <RadioGroupItem value='weekly' id='weekly' />
-                  <Label htmlFor='weekly'>Weekly</Label>
-                </div>
-              </RadioGroup>
-
-              {recurringType === 'weekly' && (
-                <div className='pt-2'>
-                  <Label className='text-sm font-medium mb-2 block'>Select days of week</Label>
-                  <div className='grid grid-cols-2 gap-2'>
-                    {weekdays.map((day) => (
-                      <div key={day.value} className='flex items-center space-x-2'>
-                        <Checkbox
-                          id={`day-${day.value}`}
-                          checked={recurringDays.includes(day.value)}
-                          onCheckedChange={(checked) => {
-                            if (checked) {
-                              setRecurringDays([...recurringDays, day.value])
-                            } else {
-                              setRecurringDays(recurringDays.filter((d) => d !== day.value))
-                            }
-                          }}
-                        />
-                        <Label htmlFor={`day-${day.value}`}>{day.label}</Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className='pt-2 border-t mt-4'>
-                <Label className='text-sm font-medium mb-2 block'>Date Range (up to one month)</Label>
-
-                <Popover open={dateRangeOpen} onOpenChange={setDateRangeOpen}>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant='outline'
-                      className={cn(
-                        'w-full justify-start text-left font-normal',
-                        !dateRange && 'text-muted-foreground'
+                          <div className='flex items-center space-x-2'>
+                            <RadioGroupItem value='weekly' id='weekly' />
+                            <Label htmlFor='weekly'>Weekly</Label>
+                          </div>
+                        </RadioGroup>
                       )}
-                    >
-                      <CalendarIcon className='mr-2 size-4' />
-                      {dateRange?.from ? (
-                        dateRange.to ? (
-                          <>
-                            {format(dateRange.from, 'MMM dd, yyyy')} - {format(dateRange.to, 'MMM dd, yyyy')}
-                          </>
-                        ) : (
-                          format(dateRange.from, 'PPP')
-                        )
-                      ) : (
-                        <span>Select date range</span>
-                      )}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className='w-auto p-0' align='start'>
-                    <CalendarComponent
-                      initialFocus
-                      mode='range'
-                      defaultMonth={dateRange?.from}
-                      selected={dateRange}
-                      onSelect={handleDateRangeSelect}
-                      numberOfMonths={2}
-                      disabled={(date) => {
-                        if (isBefore(date, new Date())) {
-                          return true
-                        }
-
-                        if (dateRange?.from && isAfter(date, addMonths(dateRange.from, 1))) {
-                          return true
-                        }
-
-                        return false
-                      }}
                     />
-                    <div className='p-3 border-t text-xs text-muted-foreground'>
-                      You can select a date range up to one month
+
+                    <FormField
+                      control={form.control}
+                      name='recurringType'
+                      render={({ field }) => (
+                        <div>
+                          {field.value === 'weekly' && (
+                            <div className='pt-2'>
+                              <Label className='text-sm font-medium mb-2 block'>Select days of week</Label>
+                              <div className='grid grid-cols-2 gap-2'>
+                                {weekdays.map((day) => (
+                                  <div key={day.value} className='flex items-center space-x-2'>
+                                    <FormField
+                                      control={form.control}
+                                      name='recurringDays'
+                                      render={({ field }) => (
+                                        <Checkbox
+                                          id={`day-${day.value}`}
+                                          checked={field.value.includes(day.value)}
+                                          onCheckedChange={(checked) => {
+                                            if (checked) {
+                                              field.onChange([...field.value, day.value])
+                                            } else {
+                                              field.onChange(field.value.filter((d) => d !== day.value))
+                                            }
+                                          }}
+                                        />
+                                      )}
+                                    />
+                                    <Label htmlFor={`day-${day.value}`}>{day.label}</Label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    />
+
+                    <div className='pt-2 border-t mt-4'>
+                      <Label className='text-sm font-medium mb-2 block'>Date Range (up to one month)</Label>
+
+                      <FormField
+                        control={form.control}
+                        name='recurringDateRange'
+                        render={({ field }) => (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant='outline'
+                                className={cn(
+                                  'w-full justify-start text-left font-normal',
+                                  !field.value && 'text-muted-foreground'
+                                )}
+                              >
+                                <CalendarIcon className='mr-2 size-4' />
+                                {field.value?.from ? (
+                                  field.value.to ? (
+                                    <>
+                                      {format(field.value.from, 'MMM dd, yyyy')} -{' '}
+                                      {format(field.value.to, 'MMM dd, yyyy')}
+                                    </>
+                                  ) : (
+                                    format(field.value.from, 'PPP')
+                                  )
+                                ) : (
+                                  <span>Select date range</span>
+                                )}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className='w-auto p-0' align='start'>
+                              <CalendarComponent
+                                initialFocus
+                                mode='range'
+                                defaultMonth={field.value?.from}
+                                selected={field.value as DateRange}
+                                onSelect={(range) => {
+                                  if (range?.from) {
+                                    if (!range.to) {
+                                      field.onChange(range)
+                                    } else if (range.to) {
+                                      const maxEndDate = addMonths(range.from, 1)
+                                      if (isAfter(range.to, maxEndDate)) {
+                                        field.onChange({
+                                          from: range.from,
+                                          to: maxEndDate
+                                        })
+                                      } else {
+                                        field.onChange(range)
+                                      }
+                                    }
+                                  } else {
+                                    field.onChange(undefined)
+                                  }
+                                }}
+                                numberOfMonths={2}
+                                disabled={(date) => {
+                                  if (moment(date).isBefore(moment(), 'day')) {
+                                    return true
+                                  }
+
+                                  const range = field.value as DateRange
+                                  if (range?.from && moment(date).isAfter(moment(range.from).add(1, 'month'), 'day')) {
+                                    return true
+                                  }
+
+                                  return false
+                                }}
+                              />
+                              <div className='p-3 border-t text-xs text-muted-foreground'>
+                                You can select a date range up to one month
+                              </div>
+                            </PopoverContent>
+                          </Popover>
+                        )}
+                      />
                     </div>
-                  </PopoverContent>
-                </Popover>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            )}
+          />
         </div>
       </div>
     </div>

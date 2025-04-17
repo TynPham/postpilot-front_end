@@ -21,7 +21,11 @@ export const usePostForm = (post: Post | undefined, time: { start: Date; end: Da
           file: new File([asset.url], asset.url),
           preview: asset.url
         })) || [],
-      selectedPages: []
+      selectedPages: [],
+      isRecurring: false,
+      recurringType: 'daily',
+      recurringDays: [],
+      recurringDateRange: undefined
     },
     resolver: zodResolver(postSchema)
   })

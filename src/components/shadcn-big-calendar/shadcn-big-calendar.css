@@ -220,8 +220,7 @@ button.rbc-input::-moz-focus-inner {
   line-height: normal;
   white-space: nowrap;
   position: absolute;
-  bottom: 0;
-  transform: translateY(100%);
+  top: 0;
   @apply w-[50px] sm:w-max;
 }
 .rbc-month-view {
@@ -315,7 +314,7 @@ button.rbc-input::-moz-focus-inner {
   border: 1px solid hsl(var(--border));
   background-color: hsl(var(--card));
   padding: 10px;
-  max-height: 500px;
+  max-height: 400px;
   overflow-y: auto;
 }
 .rbc-overlay > * + * {

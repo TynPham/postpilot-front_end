@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useRef, useState } from 'react'
 import { PLATFORM_ICONS } from '@/constants'
-import { CalendarCheck, Check, Ellipsis, Loader2, X } from 'lucide-react'
-import moment from 'moment'
+import { CalendarCheck, Check, Ellipsis, X } from 'lucide-react'
+import { VscFolderActive } from 'react-icons/vsc'
 
-import { Credential } from '@/types/credentials'
-import { Post } from '@/types/post'
 import { cn } from '@/lib/utils'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
@@ -55,7 +53,8 @@ export default function EventCard({ event }: EventCardProps) {
         className={cn('flex justify-between items-center lg:p-2 h-full lg:border-l-2', {
           'border-destructive': event.status === 'failed',
           'border-success': event.status === 'published',
-          'border-info': event.status === 'scheduled' || event.status === 'pending'
+          'border-info': event.status === 'scheduled' || event.status === 'pending',
+          'border-accent': event.status === 'active'
         })}
       >
         <div className='flex flex-col justify-between flex-1 min-w-0'>
@@ -65,10 +64,10 @@ export default function EventCard({ event }: EventCardProps) {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className='text-sm font-medium truncate'>{socialCredential.metadata.name}</span>
+                  <span className='text-sm font-medium truncate'>{socialCredential?.metadata.name}</span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  <p>{socialCredential.metadata.name}</p>
+                  <p>{socialCredential?.metadata.name}</p>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
@@ -76,11 +75,19 @@ export default function EventCard({ event }: EventCardProps) {
 
           {/* Status */}
           {isCompact && (
-            <div className='flex items-center justify-center gap-2 size-4 bg-success text-primary-foreground rounded-full'>
+            <div
+              className={cn('flex items-center justify-center gap-2 size-5 text-primary-foreground rounded-full', {
+                'bg-destructive': event.status === 'failed',
+                'bg-success': event.status === 'published',
+                'bg-info': event.status === 'scheduled' || event.status === 'pending',
+                'bg-gray-600': event.status === 'active'
+              })}
+            >
               {event.status === 'scheduled' && <CalendarCheck className='size-3' />}
               {event.status === 'pending' && <Ellipsis className='size-3' />}
               {event.status === 'published' && <Check className='size-3' />}
               {event.status === 'failed' && <X className='size-3' />}
+              {event.status === 'active' && <VscFolderActive className='size-3' />}
             </div>
           )}
           {!isCompact && (
@@ -91,7 +98,9 @@ export default function EventCard({ event }: EventCardProps) {
                     ? 'info'
                     : event.status === 'published'
                       ? 'success'
-                      : 'destructive'
+                      : event.status === 'active'
+                        ? 'active'
+                        : 'destructive'
                 }
               >
                 {event.status}
@@ -109,8 +118,8 @@ export default function EventCard({ event }: EventCardProps) {
             'border-destructive': event.status === 'failed'
           })}
         >
-          <AvatarImage src={socialCredential.metadata.avatar_url || ''} alt={socialCredential.metadata.name} />
-          <AvatarFallback>{socialCredential.metadata.name.charAt(0) || 'A'}</AvatarFallback>
+          <AvatarImage src={socialCredential?.metadata.avatar_url || ''} alt={socialCredential?.metadata.name} />
+          <AvatarFallback>{socialCredential?.metadata.name.charAt(0) || 'A'}</AvatarFallback>
         </Avatar>
       </div>
     </div>

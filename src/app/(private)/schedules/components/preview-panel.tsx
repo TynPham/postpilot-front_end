@@ -134,7 +134,7 @@ export const PreviewPanel = ({
           </Card>
         </div>
 
-        {((post && post.status === 'scheduled') || !post) && (
+        {(post && post.status === 'scheduled') || !post ? (
           <div className='flex justify-end gap-4'>
             <Button variant='outline' onClick={onClose}>
               Cancel
@@ -144,6 +144,8 @@ export const PreviewPanel = ({
               {isSubmitting && <Loader2 className='size-4 animate-spin' />}
             </Button>
           </div>
+        ) : (
+          <div></div>
         )}
       </div>
     </div>

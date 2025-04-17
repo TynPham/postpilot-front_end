@@ -80,33 +80,56 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
     setOpenCreateScheduleModal(true)
   }
 
-  const handlePostProcessed = (data: { postId: string; status: string; timestamp: string }) => {
+  const handlePostProcessed = (data: {
+    postId?: string
+    status: string
+    timestamp: string
+    post?: Post
+    virtualId?: string
+  }) => {
     queryClient.setQueryData(['posts'], (oldData: AxiosResponse<SuccessResponse<Post[]>>) => {
+      console.log(data)
       if (!oldData?.data?.data) return oldData
+      const postIndex = oldData.data.data.findIndex(
+        (post: Post) => post.id === data?.postId || post.id === data?.virtualId
+      )
+
+      const newData = [...oldData.data.data]
+      newData[postIndex] = { ...newData[postIndex], status: data.status }
 
       return {
         ...oldData,
         data: {
           ...oldData.data,
-          data: oldData.data.data.map((post: Post) =>
-            post.id === data.postId ? { ...post, status: data.status } : post
-          )
+          data: newData
         }
       }
     })
   }
 
-  const handlePostFailed = (data: { postId: string; status: string; error: string; timestamp: string }) => {
+  const handlePostFailed = (data: {
+    postId: string
+    status: string
+    error: string
+    timestamp: string
+    post?: Post
+    virtualId?: string
+  }) => {
     queryClient.setQueryData(['posts'], (oldData: AxiosResponse<SuccessResponse<Post[]>>) => {
       if (!oldData?.data?.data) return oldData
+
+      const postIndex = oldData.data.data.findIndex(
+        (post: Post) => post.id === data?.postId || post.id === data?.virtualId
+      )
+
+      const newData = [...oldData.data.data]
+      newData[postIndex] = { ...newData[postIndex], status: data.status }
 
       return {
         ...oldData,
         data: {
           ...oldData.data,
-          data: oldData.data.data.map((post: Post) =>
-            post.id === data.postId ? { ...post, status: data.status, error: data.error } : post
-          )
+          data: newData
         }
       }
     })
