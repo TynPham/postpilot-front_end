@@ -34,7 +34,7 @@ const platformColors: Record<string, string> = {
 }
 
 const renderComment = (post: Post) => {
-  const comments = post?.publishedPost?.metadata?.comments?.data || post?.publishedPost?.metadata?.comments || []
+  const comments = Array.isArray(post?.publishedPost?.metadata?.comments) ? post?.publishedPost?.metadata?.comments : []
   return (
     comments.length > 0 && (
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
@@ -43,27 +43,30 @@ const renderComment = (post: Post) => {
             <h2 className='text-xl font-semibold mb-4'>Comments</h2>
 
             <div className='space-y-6'>
-              {comments?.map((comment: any, index: number) => (
-                <div key={comment.id ?? index} className='flex gap-4'>
-                  <Avatar className='size-10'>
-                    <AvatarImage src={comment?.from?.picture?.data?.url ?? ''} />
-                    <AvatarFallback className={cn('text-white', platformColors[post.platform])}>
-                      {comment?.from?.name.charAt(0) || comment?.username?.charAt(0) || <User className='size-4' />}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2 mb-1'>
-                      <span className='font-semibold'>
-                        {comment?.from?.name || comment?.username || `${toCapitalize(post.platform)} user`}
-                      </span>
-                      <span className='text-sm text-muted-foreground'>
-                        {format(comment?.created_time || comment?.timestamp || '', "MMM d, yyyy 'at' h:mm a")}
-                      </span>
+              {comments?.map((comment: any, index: number) => {
+                const timestamp = comment?.created_time || comment?.timestamp
+                const formattedTime = timestamp ? format(new Date(timestamp), "MMM d, yyyy 'at' h:mm a") : ''
+
+                return (
+                  <div key={comment.id ?? index} className='flex gap-4'>
+                    <Avatar className='size-10'>
+                      <AvatarImage src={comment?.from?.picture?.data?.url ?? ''} />
+                      <AvatarFallback className={cn('text-white', platformColors[post.platform])}>
+                        {comment?.from?.name.charAt(0) || comment?.username?.charAt(0) || <User className='size-4' />}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-1'>
+                        <span className='font-semibold'>
+                          {comment?.from?.name || comment?.username || `${toCapitalize(post.platform)} user`}
+                        </span>
+                        <span className='text-sm text-muted-foreground'>{formattedTime}</span>
+                      </div>
+                      <p className='text-sm'>{comment?.message || comment?.text || ''}</p>
                     </div>
-                    <p className='text-sm'>{comment?.message || comment?.text || ''}</p>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </CardContent>
         </Card>
@@ -77,10 +80,8 @@ export default function PostDetails({ post }: PostDetailsProps) {
   const platform = pathname.split('/')[2]
   const router = useRouter()
 
-  console.log(post)
-
   return (
-    <div className='min-h-screen bg-muted'>
+    <div className='min-h-screen bg-muted relative'>
       <div className='container mx-auto py-8'>
         <div className='max-w-4xl mx-auto'>
           <ElementEffect animationProps={FADE_IN_ANIMATION}>
@@ -130,29 +131,34 @@ export default function PostDetails({ post }: PostDetailsProps) {
 
                 <PostDetailsListImage images={post?.metadata?.assets ?? []} />
 
-                {post?.publishedPost?.metadata?.likes?.length > 0 && (
-                  <div className='pt-2 pb-1'>
-                    <p className='text-xs flex gap-1 items-center'>
-                      <ThumbsUp className='size-3' />
-                      <span className='italic'>{post?.publishedPost?.metadata?.likes[0]?.name}</span>{' '}
-                      {post?.publishedPost?.metadata?.likes?.length > 1 && 'and others'}
-                    </p>
-                  </div>
-                )}
+                {Array.isArray(post?.publishedPost?.metadata?.likes) &&
+                  post?.publishedPost?.metadata?.likes?.length > 0 && (
+                    <div className='pt-2 pb-1'>
+                      <p className='text-xs flex gap-1 items-center'>
+                        <ThumbsUp className='size-3' />
+                        <span className='italic'>{post?.publishedPost?.metadata?.likes[0]?.name}</span>{' '}
+                        {post?.publishedPost?.metadata?.likes?.length > 1 && 'and others'}
+                      </p>
+                    </div>
+                  )}
 
                 <div className={cn('flex items-center gap-4 pt-2 border-t')}>
                   <Button variant='outline' className='flex-1'>
                     <ThumbsUp className='mr-2 size-4' />
                     Like
                     <Badge variant='default' className='ml-2 rounded-md'>
-                      {post?.publishedPost?.metadata?.likes || post?.publishedPost?.metadata?.likes?.length || 0}
+                      {Array.isArray(post?.publishedPost?.metadata?.likes)
+                        ? post?.publishedPost?.metadata?.likes?.length
+                        : post?.publishedPost?.metadata?.likes || 0}
                     </Badge>
                   </Button>
                   <Button variant='outline' className='flex-1'>
                     <MessageCircle className='mr-2 size-4' />
                     Comment
                     <Badge variant='default' className='ml-2 rounded-md'>
-                      {post?.publishedPost?.metadata?.comments || post?.publishedPost?.metadata?.comments?.length || 0}
+                      {Array.isArray(post?.publishedPost?.metadata?.comments)
+                        ? post?.publishedPost?.metadata?.comments?.length
+                        : post?.publishedPost?.metadata?.comments || 0}
                     </Badge>
                   </Button>
                   {post.platform !== Platform.X && (
