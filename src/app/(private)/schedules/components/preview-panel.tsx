@@ -33,6 +33,7 @@ export const PreviewPanel = ({
   onClose,
   onShowSlider
 }: PreviewPanelProps) => {
+  console.log(post?.status)
   return (
     <div className='flex-1 border-l'>
       <div className='p-6 flex flex-col justify-between h-full gap-4'>
@@ -134,14 +135,20 @@ export const PreviewPanel = ({
           </Card>
         </div>
 
-        {(post && post.status === 'scheduled') || !post ? (
+        {!post || (post && post?.status !== 'published') ? (
           <div className='flex justify-end gap-4'>
             <Button variant='outline' onClick={onClose}>
               Cancel
             </Button>
             <Button disabled={isSubmitting} type='submit'>
-              {isSubmitting ? 'Scheduling...' : 'Schedule Post'}
-              {isSubmitting && <Loader2 className='size-4 animate-spin' />}
+              {isSubmitting
+                ? post?.status
+                  ? 'Updating...'
+                  : 'Scheduling...'
+                : post?.status
+                  ? 'Update Post'
+                  : 'Schedule Post'}
+              {isSubmitting && <Loader2 className='size-4 animate-spin ml-2' />}
             </Button>
           </div>
         ) : (

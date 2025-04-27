@@ -5,14 +5,14 @@ import { useEffect, useState } from 'react'
 import { PostType } from '@/constants/post'
 import { useAppContext } from '@/contexts/app-context'
 import { useUploadImagesMutation } from '@/queries/media'
-import { useCreatePostMutation } from '@/queries/post'
+import { useCreatePostMutation, useUpdatePostMutation } from '@/queries/post'
 import { useCreateRecurring } from '@/queries/recurring'
 import { PostSchema } from '@/schema-validations/post'
 import moment from 'moment'
 
 import { Credential } from '@/types/credentials'
 import { ImagePreview } from '@/types/media'
-import { CreatePostRequest, CreateRecurringRequest } from '@/types/post'
+import { CreatePostRequest, CreateRecurringRequest, UpdatePostRequest } from '@/types/post'
 import { handleErrorApi } from '@/lib/utils'
 import { usePostForm } from '@/hooks/use-post-form'
 import { toast } from '@/hooks/use-toast'
@@ -47,6 +47,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
   const createPostMutation = useCreatePostMutation()
   const createRecurringMutation = useCreateRecurring()
   const uploadImagesMutation = useUploadImagesMutation()
+  const updatePostMutation = useUpdatePostMutation(post?.id || '')
 
   // Effect handlers
   useEffect(() => {
@@ -116,7 +117,13 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
   }
 
   const onSubmit = async (data: PostSchema) => {
-    if (createPostMutation.isPending || uploadImagesMutation.isPending || createRecurringMutation.isPending) return
+    if (
+      createPostMutation.isPending ||
+      uploadImagesMutation.isPending ||
+      createRecurringMutation.isPending ||
+      updatePostMutation.isPending
+    )
+      return
     if (form.getValues('selectedPages')?.length === 0) {
       toast({
         title: 'Error',
@@ -209,7 +216,8 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
             ? data.recurringDays.map((day) => dayMapping[day]).sort((a, b) => a - b)
             : undefined
 
-        const body: CreateRecurringRequest = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const body: any = {
           socialPosts,
           publicationTime: moment()
             .set({
@@ -237,23 +245,44 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
               .format('YYYY-MM-DDTHH:mm:ss[Z]')
           }
         }
-
         await createRecurringMutation.mutateAsync(body)
         toast({
           title: 'Success',
           description: 'Recurring schedule has been created successfully'
         })
       } else {
-        const body: CreatePostRequest = {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const body: any = {
           publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
           socialPosts
         }
-
-        await createPostMutation.mutateAsync(body)
-        toast({
-          title: 'Success',
-          description: 'Post has been scheduled successfully'
-        })
+        if (!post) {
+          await createPostMutation.mutateAsync(body)
+          toast({
+            title: 'Success',
+            description: 'Post has been scheduled successfully'
+          })
+        } else if (post.status !== 'published') {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const body: any = {
+            publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
+            metadata: {
+              type: data.type,
+              content: data.description,
+              assets:
+                // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                uploadImagesResponse?.data?.data?.map((image: any) => ({
+                  type: image.type,
+                  url: image.url
+                })) || []
+            }
+          }
+          await updatePostMutation.mutateAsync(body)
+          toast({
+            title: 'Success',
+            description: 'Post has been updated successfully'
+          })
+        }
       }
 
       setOpen(false)
@@ -300,7 +329,10 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
               credentials={credentials}
               post={post}
               isSubmitting={
-                createPostMutation.isPending || uploadImagesMutation.isPending || createRecurringMutation.isPending
+                createPostMutation.isPending ||
+                uploadImagesMutation.isPending ||
+                createRecurringMutation.isPending ||
+                updatePostMutation.isPending
               }
               onRemoveImage={removeImage}
               onClose={() => setOpen(false)}

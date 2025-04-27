@@ -1,17 +1,34 @@
 'use client'
 
-import { Fragment, use } from 'react'
+import { Fragment, use, useEffect, useState } from 'react'
 import Link from 'next/link'
+import postApi from '@/apis/posts.api'
+import { PLATFORM_TYPE } from '@/constants'
 import { FADE_IN_ANIMATION, FADE_IN_STAGGER_ANIMATION, fadeInChildVariants } from '@/constants/effects'
 import { POST_STATUS, PostStatus, PostType } from '@/constants/post'
+import { useAppContext } from '@/contexts/app-context'
+import { useDeletePostMutation } from '@/queries/post'
 import { format } from 'date-fns'
-import { Clock, MoreVertical } from 'lucide-react'
+import { Clock, Loader2, MoreVertical, Trash2 } from 'lucide-react'
 
 import { Post } from '@/types/post'
 import { SuccessResponse } from '@/types/utils'
+import { handleErrorApi } from '@/lib/utils'
+import { toast } from '@/hooks/use-toast'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
+import { Button, buttonVariants } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,17 +42,50 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import ElementEffect from '@/components/effects/element-effect'
 import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
+import CreatePostModal from '../../schedules/create-post-modal'
 import EmptyPost from './empty-post'
 
 export function PostList({
   status,
-  postsPromise
+  postsPromise,
+  platform,
+  accessToken
 }: {
   status: PostStatus
   postsPromise: Promise<SuccessResponse<Post[]>>
+  platform: (typeof PLATFORM_TYPE)[keyof typeof PLATFORM_TYPE]
+  accessToken: string
 }) {
-  const posts = use(postsPromise)
+  const postResolve = use(postsPromise)
+
+  const [posts, setPosts] = useState<SuccessResponse<Post[]>>(
+    postResolve ?? {
+      data: [],
+      message: 'Success'
+    }
+  )
+
   const scheduledPosts = posts?.data.filter((post) => post.status === status)
+
+  const deletePostMutation = useDeletePostMutation()
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
+  const handleDeletePost = async (postId: string) => {
+    if (deletePostMutation.isPending) return
+    try {
+      await deletePostMutation.mutateAsync(postId)
+      toast({
+        title: 'Success',
+        description: 'Delete Post Successfully!'
+      })
+      setIsModalOpen(false)
+      const updatedPosts = await postApi.getPostsServer(accessToken, { platform })
+      setPosts(updatedPosts.data)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
 
   // Group posts by date
   const groupedPosts = scheduledPosts?.reduce(
@@ -52,6 +102,8 @@ export function PostList({
     },
     {} as Record<string, Post[]>
   )
+
+  const { openCreateScheduleModal, setOpenCreateScheduleModal } = useAppContext()
 
   return (
     <div className='space-y-8'>
@@ -131,9 +183,52 @@ export function PostList({
                               </DropdownMenuItem>
                               {post.status === POST_STATUS.SCHEDULED && (
                                 <>
-                                  <DropdownMenuItem>Edit post</DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <Link href={`/schedules`}>Edit post</Link>
+                                  </DropdownMenuItem>
                                   <DropdownMenuSeparator />
-                                  <DropdownMenuItem className='text-red-600'>Delete post</DropdownMenuItem>
+
+                                  <DropdownMenuItem asChild>
+                                    <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+                                      <AlertDialogTrigger asChild>
+                                        {/* To make a button looks like dropdown menu item */}
+                                        <Button
+                                          size='sm'
+                                          variant='ghost'
+                                          className='w-full flex items-center justify-start gap-2 px-2 py-1.5 text-sm text-red-500 hover:text-red-500'
+                                        >
+                                          <Trash2 className='size-4' />
+                                          Delete
+                                        </Button>
+                                        {/* Show Dialog */}
+                                      </AlertDialogTrigger>
+                                      <AlertDialogContent>
+                                        <AlertDialogHeader>
+                                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                          <AlertDialogDescription>
+                                            This action cannot be undone. This will permanently delete your account and
+                                            remove your data from our servers.
+                                          </AlertDialogDescription>
+                                        </AlertDialogHeader>
+                                        <AlertDialogFooter>
+                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogAction
+                                            disabled={deletePostMutation.isPending}
+                                            className={buttonVariants({ variant: 'destructive' })}
+                                            onClick={(e) => {
+                                              e.preventDefault()
+                                              handleDeletePost(post.id)
+                                            }}
+                                          >
+                                            Continue
+                                            {deletePostMutation.isPending && (
+                                              <Loader2 className='size-4 animate-spin ml-2' />
+                                            )}
+                                          </AlertDialogAction>
+                                        </AlertDialogFooter>
+                                      </AlertDialogContent>
+                                    </AlertDialog>
+                                  </DropdownMenuItem>
                                 </>
                               )}
                             </DropdownMenuContent>

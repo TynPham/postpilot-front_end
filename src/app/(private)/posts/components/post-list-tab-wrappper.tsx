@@ -14,7 +14,7 @@ export interface PostListTabWrapperProps {
 export default function PostListTabWrapper({ children, statusTabs, platform }: PostListTabWrapperProps) {
   return (
     <Tabs defaultValue={statusTabs} className='w-full'>
-      <TabsList className='grid w-full max-w-[400px] grid-cols-2 mb-8'>
+      <TabsList className='grid w-full max-w-[500px] grid-cols-3 mb-8'>
         <TabsTrigger
           value={POST_STATUS.SCHEDULED}
           onClick={() => {
@@ -30,6 +30,14 @@ export default function PostListTabWrapper({ children, statusTabs, platform }: P
           }}
         >
           Published Posts
+        </TabsTrigger>
+        <TabsTrigger
+          value={POST_STATUS.ACTIVE}
+          onClick={() => {
+            setTabStatus(platform, POST_STATUS.ACTIVE)
+          }}
+        >
+          Active Posts
         </TabsTrigger>
       </TabsList>
       {children}

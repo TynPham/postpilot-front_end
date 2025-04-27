@@ -59,7 +59,7 @@ export const CredentialsPanel = ({ form, credentials, onScheduleAll }: Credentia
                       <Avatar className='size-8'>
                         <AvatarImage src={credential.metadata.avatar_url} />
                         <AvatarFallback>
-                          <PlatformIcon className='size-8' />
+                          <PlatformIcon className='size-6' />
                         </AvatarFallback>
                       </Avatar>
                       <FormLabel className='font-normal cursor-pointer flex items-center gap-2'>

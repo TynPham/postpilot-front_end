@@ -41,6 +41,18 @@ export type CreatePostRequest = {
   }[]
 }
 
+export type UpdatePostRequest = {
+  publicationTime: string
+  metadata: {
+    type: string
+    content: string
+    assets: {
+      type: string
+      url: string
+    }[]
+  }
+}
+
 export type RecurringPost = {
   id: string
   frequency: 'daily' | 'weekly'

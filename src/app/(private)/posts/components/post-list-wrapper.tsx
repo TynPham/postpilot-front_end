@@ -35,6 +35,8 @@ export default async function PostListWrapper({ platform }: PostListWrapperProps
             <TabsContent value={POST_STATUS.SCHEDULED}>
               <Suspense fallback={<PostListSkeleton />}>
                 <PostList
+                  accessToken={accessToken}
+                  platform={platform}
                   status={POST_STATUS.SCHEDULED}
                   postsPromise={postsPromise.then((response) => response.data)}
                 />
@@ -43,7 +45,19 @@ export default async function PostListWrapper({ platform }: PostListWrapperProps
             <TabsContent value={POST_STATUS.PUBLISHED}>
               <Suspense fallback={<PostListSkeleton />}>
                 <PostList
+                  accessToken={accessToken}
+                  platform={platform}
                   status={POST_STATUS.PUBLISHED}
+                  postsPromise={postsPromise.then((response) => response.data)}
+                />
+              </Suspense>
+            </TabsContent>
+            <TabsContent value={POST_STATUS.ACTIVE}>
+              <Suspense fallback={<PostListSkeleton />}>
+                <PostList
+                  accessToken={accessToken}
+                  platform={platform}
+                  status={POST_STATUS.ACTIVE}
                   postsPromise={postsPromise.then((response) => response.data)}
                 />
               </Suspense>
