@@ -9,7 +9,10 @@ import { POST_STATUS, PostStatus, PostType } from '@/constants/post'
 import { useAppContext } from '@/contexts/app-context'
 import { useDeletePostMutation } from '@/queries/post'
 import { format } from 'date-fns'
+import { enUS, vi } from 'date-fns/locale'
 import { Clock, Loader2, MoreVertical, Trash2 } from 'lucide-react'
+import moment from 'moment'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Post } from '@/types/post'
 import { SuccessResponse } from '@/types/utils'
@@ -103,8 +106,11 @@ export function PostList({
     {} as Record<string, Post[]>
   )
 
-  const { openCreateScheduleModal, setOpenCreateScheduleModal } = useAppContext()
+  const t = useTranslations('posts')
 
+  const locale = useLocale()
+
+  const dateFnsLocale = locale === 'vi' ? vi : enUS
   return (
     <div className='space-y-8'>
       {groupedPosts &&
@@ -112,17 +118,19 @@ export function PostList({
           <ElementEffect key={date} animationProps={FADE_IN_ANIMATION}>
             <div className='space-y-4'>
               <h2 className='text-2xl font-semibold sticky top-0 bg-background/95 backdrop-blur py-2 z-10 w-max'>
-                {format(new Date(date), 'EEEE, MMMM d yyyy')}
+                {format(new Date(date), 'EEEE, MMMM d yyyy', {
+                  locale: dateFnsLocale
+                })}
               </h2>
               <ScrollArea className='rounded-md border'>
                 <Table className='overflow-hidden relative table-fixed'>
                   <TableHeader>
                     <TableRow>
-                      <TableHead className='w-[250px] whitespace-nowrap'>Post</TableHead>
-                      <TableHead className='w-[100px] whitespace-nowrap'>Type</TableHead>
-                      <TableHead className='w-[200px] whitespace-nowrap'>Author</TableHead>
-                      <TableHead className='w-[150px] whitespace-nowrap'>Scheduled Time</TableHead>
-                      <TableHead className='w-[100px] text-right whitespace-nowrap'>Actions</TableHead>
+                      <TableHead className='w-[250px] whitespace-nowrap'>{t('post')}</TableHead>
+                      <TableHead className='w-[100px] whitespace-nowrap'>{t('type')}</TableHead>
+                      <TableHead className='w-[200px] whitespace-nowrap'>{t('author')}</TableHead>
+                      <TableHead className='w-[150px] whitespace-nowrap'>{t('scheduledTime')}</TableHead>
+                      <TableHead className='w-[100px] text-right whitespace-nowrap'>{t('actions')}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <ElementEffectStagger
@@ -177,14 +185,14 @@ export function PostList({
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align='end'>
-                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
                               <DropdownMenuItem>
-                                <Link href={`/posts/${post.platform}/${post.id}`}>View details</Link>
+                                <Link href={`/posts/${post.platform}/${post.id}`}>{t('viewDetails')}</Link>
                               </DropdownMenuItem>
                               {post.status === POST_STATUS.SCHEDULED && (
                                 <>
                                   <DropdownMenuItem>
-                                    <Link href={`/schedules`}>Edit post</Link>
+                                    <Link href={`/schedules`}>{t('post')}</Link>
                                   </DropdownMenuItem>
                                   <DropdownMenuSeparator />
 
@@ -198,20 +206,17 @@ export function PostList({
                                           className='w-full flex items-center justify-start gap-2 px-2 py-1.5 text-sm text-red-500 hover:text-red-500'
                                         >
                                           <Trash2 className='size-4' />
-                                          Delete
+                                          {t('delete')}
                                         </Button>
                                         {/* Show Dialog */}
                                       </AlertDialogTrigger>
                                       <AlertDialogContent>
                                         <AlertDialogHeader>
-                                          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                                          <AlertDialogDescription>
-                                            This action cannot be undone. This will permanently delete your account and
-                                            remove your data from our servers.
-                                          </AlertDialogDescription>
+                                          <AlertDialogTitle>{t('confirmTitle')}</AlertDialogTitle>
+                                          <AlertDialogDescription>{t('confirmDescription')}</AlertDialogDescription>
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
-                                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
                                           <AlertDialogAction
                                             disabled={deletePostMutation.isPending}
                                             className={buttonVariants({ variant: 'destructive' })}
@@ -220,7 +225,7 @@ export function PostList({
                                               handleDeletePost(post.id)
                                             }}
                                           >
-                                            Continue
+                                            {t('Continue')}
                                             {deletePostMutation.isPending && (
                                               <Loader2 className='size-4 animate-spin ml-2' />
                                             )}

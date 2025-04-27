@@ -1,7 +1,9 @@
+import { PostType } from '@/constants/post'
 import { PostSchema } from '@/schema-validations/post'
 import { addMonths, format, isAfter, isBefore } from 'date-fns'
+import { enUS, vi } from 'date-fns/locale'
 import { Calendar, CalendarIcon, Upload } from 'lucide-react'
-import moment from 'moment'
+import { useLocale, useTranslations } from 'next-intl'
 import { DateRange } from 'react-day-picker'
 import { UseFormReturn } from 'react-hook-form'
 
@@ -25,17 +27,22 @@ interface FormPanelProps {
 }
 
 export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
+  const t = useTranslations('createPostModal')
+
   const weekdays = [
-    { value: 'monday', label: 'Monday' },
-    { value: 'tuesday', label: 'Tuesday' },
-    { value: 'wednesday', label: 'Wednesday' },
-    { value: 'thursday', label: 'Thursday' },
-    { value: 'friday', label: 'Friday' },
-    { value: 'saturday', label: 'Saturday' },
-    { value: 'sunday', label: 'Sunday' }
+    { value: 'monday', label: t('monday') },
+    { value: 'tuesday', label: t('tuesday') },
+    { value: 'wednesday', label: t('wednesday') },
+    { value: 'thursday', label: t('thursday') },
+    { value: 'friday', label: t('friday') },
+    { value: 'saturday', label: t('saturday') },
+    { value: 'sunday', label: t('sunday') }
   ]
 
   const isRecurring = form.watch('isRecurring')
+
+  const locale = useLocale()
+  const dateFnsLocale = locale === 'vi' ? vi : enUS
 
   return (
     <div className='flex-1'>
@@ -47,11 +54,11 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
             render={({ field }) => (
               <FormItem className='space-y-3'>
                 <FormLabel>
-                  Type <span className='text-red-500'>*</span>
+                  {t('type')} <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <RadioGroup onValueChange={field.onChange} value={field.value} className='flex flex-wrap gap-4'>
-                    {['post', 'story', 'reel'].map((type) => (
+                    {Object.values(PostType).map((type) => (
                       <FormItem key={type}>
                         <FormControl>
                           <RadioGroupItem value={type} className='peer sr-only' id={type} />
@@ -60,7 +67,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                           htmlFor={type}
                           className='flex items-center justify-center rounded-md border-2 border-muted bg-transparent px-6 py-2 hover:bg-muted peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer'
                         >
-                          {type.toUpperCase()}
+                          {t(type).toUpperCase()}
                         </FormLabel>
                       </FormItem>
                     ))}
@@ -77,7 +84,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>
-                  Description <span className='text-red-500'>*</span>
+                  {t('description')} <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
                   <AppInput field={field} />
@@ -89,7 +96,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
 
           <Accordion type='single' collapsible className='w-full'>
             <AccordionItem value='media'>
-              <AccordionTrigger>Media</AccordionTrigger>
+              <AccordionTrigger>{t('media')}</AccordionTrigger>
               <AccordionContent>
                 <FormField
                   control={form.control}
@@ -112,7 +119,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                               className='cursor-pointer flex flex-col items-center justify-center py-6 bg-muted hover:bg-muted/80 rounded-md transition-colors'
                             >
                               <Upload className='size-8 mb-2' />
-                              <p className='text-sm text-muted-foreground'>Upload Images</p>
+                              <p className='text-sm text-muted-foreground'>{t('uploadImages')}</p>
                             </label>
                           </CardContent>
                         </Card>
@@ -132,7 +139,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
               name='scheduledDate'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Scheduled Date</FormLabel>
+                  <FormLabel>{t('scheduledDate')}</FormLabel>
                   <Popover>
                     <PopoverTrigger asChild>
                       <FormControl>
@@ -145,7 +152,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                           )}
                           disabled={isRecurring}
                         >
-                          {field.value ? moment(field.value).format('MM/DD/YYYY') : 'Pick a date'}
+                          {field.value ? format(field.value, 'MM/dd/yyyy', { locale: dateFnsLocale }) : t('pickDate')}
                           <Calendar className='ml-auto size-4 opacity-50' />
                         </Button>
                       </FormControl>
@@ -153,18 +160,15 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                     <PopoverContent className='w-auto p-0' align='start'>
                       <CalendarComponent
                         mode='single'
+                        locale={dateFnsLocale}
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
-                        disabled={(date) => moment(date).isBefore(moment(), 'day')}
+                        disabled={(date) => isBefore(date, new Date())}
                       />
                     </PopoverContent>
                   </Popover>
-                  {isRecurring && (
-                    <p className='text-xs text-muted-foreground mt-1'>
-                      Scheduled date will be determined by regular posting schedule
-                    </p>
-                  )}
+                  {isRecurring && <p className='text-xs text-muted-foreground mt-1'>{t('dateNote')}</p>}
                   <FormMessage />
                 </FormItem>
               )}
@@ -178,7 +182,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                   <FormLabel>
                     <div className='flex items-center justify-end space-x-2'>
                       <Label htmlFor='recurring-toggle' className='text-sm'>
-                        Recurring
+                        {t('recurring')}
                       </Label>
                       <FormField
                         control={form.control}
@@ -206,7 +210,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
               <div>
                 {field.value && (
                   <div className='border rounded-md p-4 space-y-4'>
-                    <Label className='text-sm font-medium block'>Recurring Schedule</Label>
+                    <Label className='text-sm font-medium block'>{t('recurringSchedule')}</Label>
 
                     <FormField
                       control={form.control}
@@ -215,12 +219,12 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                         <RadioGroup value={field.value} onValueChange={field.onChange} className='space-y-2'>
                           <div className='flex items-center space-x-2'>
                             <RadioGroupItem value='daily' id='daily' />
-                            <Label htmlFor='daily'>Daily</Label>
+                            <Label htmlFor='daily'>{t('daily')}</Label>
                           </div>
 
                           <div className='flex items-center space-x-2'>
                             <RadioGroupItem value='weekly' id='weekly' />
-                            <Label htmlFor='weekly'>Weekly</Label>
+                            <Label htmlFor='weekly'>{t('weekly')}</Label>
                           </div>
                         </RadioGroup>
                       )}
@@ -233,7 +237,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                         <div>
                           {field.value === 'weekly' && (
                             <div className='pt-2'>
-                              <Label className='text-sm font-medium mb-2 block'>Select days of week</Label>
+                              <Label className='text-sm font-medium mb-2 block'>{t('selectDateOfWeek')}</Label>
                               <div className='grid grid-cols-2 gap-2'>
                                 {weekdays.map((day) => (
                                   <div key={day.value} className='flex items-center space-x-2'>
@@ -265,7 +269,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                     />
 
                     <div className='pt-2 border-t mt-4'>
-                      <Label className='text-sm font-medium mb-2 block'>Date Range (up to one month)</Label>
+                      <Label className='text-sm font-medium mb-2 block'>{t('dateRange')}</Label>
 
                       <FormField
                         control={form.control}
@@ -284,19 +288,20 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                                 {field.value?.from ? (
                                   field.value.to ? (
                                     <>
-                                      {format(field.value.from, 'MMM dd, yyyy')} -{' '}
-                                      {format(field.value.to, 'MMM dd, yyyy')}
+                                      {format(field.value.from, 'PP', { locale: dateFnsLocale })} -{' '}
+                                      {format(field.value.to, 'PP', { locale: dateFnsLocale })}
                                     </>
                                   ) : (
-                                    format(field.value.from, 'PPP')
+                                    format(field.value.from, 'PP', { locale: dateFnsLocale })
                                   )
                                 ) : (
-                                  <span>Select date range</span>
+                                  <span>{t('selectDateRangeTitle')}</span>
                                 )}
                               </Button>
                             </PopoverTrigger>
                             <PopoverContent className='w-auto p-0' align='start'>
                               <CalendarComponent
+                                locale={dateFnsLocale}
                                 initialFocus
                                 mode='range'
                                 defaultMonth={field.value?.from}
@@ -322,21 +327,19 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                                 }}
                                 numberOfMonths={2}
                                 disabled={(date) => {
-                                  if (moment(date).isBefore(moment(), 'day')) {
+                                  if (isBefore(date, new Date())) {
                                     return true
                                   }
 
                                   const range = field.value as DateRange
-                                  if (range?.from && moment(date).isAfter(moment(range.from).add(1, 'month'), 'day')) {
+                                  if (range?.from && isAfter(date, addMonths(range.from, 1))) {
                                     return true
                                   }
 
                                   return false
                                 }}
                               />
-                              <div className='p-3 border-t text-xs text-muted-foreground'>
-                                You can select a date range up to one month
-                              </div>
+                              <div className='p-3 border-t text-xs text-muted-foreground'>{t('youCanSelect')}</div>
                             </PopoverContent>
                           </Popover>
                         )}

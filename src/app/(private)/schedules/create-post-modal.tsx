@@ -9,6 +9,7 @@ import { useCreatePostMutation, useUpdatePostMutation } from '@/queries/post'
 import { useCreateRecurring } from '@/queries/recurring'
 import { PostSchema } from '@/schema-validations/post'
 import moment from 'moment'
+import { useTranslations } from 'next-intl'
 
 import { Credential } from '@/types/credentials'
 import { ImagePreview } from '@/types/media'
@@ -35,6 +36,7 @@ export interface CreatePostModalProps {
 }
 
 export default function CreatePostModal({ open, setOpen, credentials, time }: CreatePostModalProps) {
+  const t = useTranslations('createPostModal')
   const { post } = useAppContext()
   const [showImageSlider, setShowImageSlider] = useState(false)
   const form = usePostForm(post, time)
@@ -316,9 +318,9 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
         setOpen(open)
       }}
     >
-      <DialogContent className='max-w-[95vw] xl:max-w-screen-xl p-0 gap-0'>
+      <DialogContent className='max-w-[95vw] xl:max-w-screen-xl p-0 gap-0 max-h-[90vh] overflow-y-auto scrollbar-none lg:overflow-y-hidden lg:max-h-full'>
         <DialogHeader className='p-6 pb-0'>
-          <DialogTitle>Schedule Post</DialogTitle>
+          <DialogTitle>{t('title')}</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className='flex flex-col lg:flex-row'>

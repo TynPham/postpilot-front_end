@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { Heart, Loader2, MessageCircle, Share2, X } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import ShowMoreText from 'react-show-more-text'
 
 import { Credential } from '@/types/credentials'
@@ -33,11 +34,11 @@ export const PreviewPanel = ({
   onClose,
   onShowSlider
 }: PreviewPanelProps) => {
-  console.log(post?.status)
+  const t = useTranslations('createPostModal')
   return (
     <div className='flex-1 border-l'>
       <div className='p-6 flex flex-col justify-between h-full gap-4'>
-        <h3 className='font-semibold text-lg'>Preview</h3>
+        <h3 className='font-semibold text-lg'>{t('preview')}</h3>
         <div className='max-h-[calc(90vh-200px)] overflow-y-auto scrollbar-none'>
           <Card className='w-full max-w-md mx-auto'>
             <CardHeader className='pb-0 px-4'>
@@ -63,7 +64,7 @@ export const PreviewPanel = ({
                   truncatedEndingComponent={'... '}
                   anchorClass='cursor-pointer text-blue-600 font-semibold'
                 >
-                  {preview.description || 'Your caption will appear here...'}
+                  {preview.description || t('captionAppear')}
                 </ShowMoreText>
               </div>
 
@@ -121,15 +122,15 @@ export const PreviewPanel = ({
             <CardFooter className='flex justify-between p-4 border-t'>
               <Button variant='ghost' size='sm'>
                 <Heart className='size-4 mr-2' />
-                Like
+                {t('like')}
               </Button>
               <Button variant='ghost' size='sm'>
                 <MessageCircle className='size-4 mr-2' />
-                Comment
+                {t('comment')}
               </Button>
               <Button variant='ghost' size='sm'>
                 <Share2 className='size-4 mr-2' />
-                Share
+                {t('share')}
               </Button>
             </CardFooter>
           </Card>
@@ -138,16 +139,16 @@ export const PreviewPanel = ({
         {!post || (post && post?.status !== 'published') ? (
           <div className='flex justify-end gap-4'>
             <Button variant='outline' onClick={onClose}>
-              Cancel
+              {t('cancel')}
             </Button>
             <Button disabled={isSubmitting} type='submit'>
               {isSubmitting
                 ? post?.status
-                  ? 'Updating...'
-                  : 'Scheduling...'
+                  ? t('updating')
+                  : t('scheduling')
                 : post?.status
-                  ? 'Update Post'
-                  : 'Schedule Post'}
+                  ? t('updatePost')
+                  : t('schedulePost')}
               {isSubmitting && <Loader2 className='size-4 animate-spin ml-2' />}
             </Button>
           </div>

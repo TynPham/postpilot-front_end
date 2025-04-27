@@ -1,14 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { Platform } from '@/constants/credentials'
 import { FADE_IN_ANIMATION } from '@/constants/effects'
 import { dummyComments } from '@/data/post.dummy'
 import { toCapitalize } from '@/utils/utils'
 import { format } from 'date-fns'
+import { enUS, vi } from 'date-fns/locale'
 import { ArrowLeft, Calendar, Clock, MessageCircle, Share2, ThumbsUp, User } from 'lucide-react'
+import moment from 'moment'
+import { useLocale, useTranslations } from 'next-intl'
 import { FaRetweet } from 'react-icons/fa'
 
 import { Post } from '@/types/post'
@@ -33,19 +35,24 @@ const platformColors: Record<string, string> = {
   reddit: 'bg-gradient-to-r from-[#ff4500] to-[#ffa500]'
 }
 
-const renderComment = (post: Post) => {
+const renderComment = (post: Post, t: any, locale: any) => {
   const comments = Array.isArray(post?.publishedPost?.metadata?.comments) ? post?.publishedPost?.metadata?.comments : []
   return (
     comments.length > 0 && (
       <ElementEffect animationProps={FADE_IN_ANIMATION}>
         <Card>
           <CardContent className='p-6'>
-            <h2 className='text-xl font-semibold mb-4'>Comments</h2>
-
+            <h2 className='text-xl font-semibold mb-4'>{t('comments')}</h2>
             <div className='space-y-6'>
               {comments?.map((comment: any, index: number) => {
                 const timestamp = comment?.created_time || comment?.timestamp
-                const formattedTime = timestamp ? format(new Date(timestamp), "MMM d, yyyy 'at' h:mm a") : ''
+                const formattedTime = timestamp
+                  ? `${format(new Date(timestamp), 'MMM d, yyyy', { locale })} ${t('at')} ${format(
+                      new Date(timestamp),
+                      'h:mm a',
+                      { locale }
+                    )}`
+                  : ''
 
                 return (
                   <div key={comment.id ?? index} className='flex gap-4'>
@@ -79,6 +86,12 @@ export default function PostDetails({ post }: PostDetailsProps) {
   const pathname = usePathname()
   const platform = pathname.split('/')[2]
   const router = useRouter()
+
+  const t = useTranslations('posts')
+
+  const locale = useLocale()
+
+  const dateFnsLocale = locale === 'vi' ? vi : enUS
 
   return (
     <div className='min-h-screen bg-muted relative'>
@@ -116,11 +129,19 @@ export default function PostDetails({ post }: PostDetailsProps) {
                   <div className='flex items-center gap-6 text-muted-foreground bg-background px-4 py-2 rounded-lg'>
                     <div className='flex items-center gap-2'>
                       <Calendar className='size-4' />
-                      <span>{format(new Date(post?.publicationTime ?? ''), 'MMM d, yyyy')}</span>
+                      <span>
+                        {format(new Date(post?.publicationTime ?? ''), 'MMM d, yyyy', {
+                          locale: dateFnsLocale
+                        })}
+                      </span>
                     </div>
                     <div className='flex items-center gap-2'>
                       <Clock className='size-4' />
-                      <span>{format(new Date(post?.publicationTime ?? ''), 'h:mm a')}</span>
+                      <span>
+                        {format(new Date(post?.publicationTime ?? ''), 'h:mm a', {
+                          locale: dateFnsLocale
+                        })}
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -145,7 +166,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
                 <div className={cn('flex items-center gap-4 pt-2 border-t')}>
                   <Button variant='outline' className='flex-1'>
                     <ThumbsUp className='mr-2 size-4' />
-                    Like
+                    {t('like')}
                     <Badge variant='default' className='ml-2 rounded-md'>
                       {Array.isArray(post?.publishedPost?.metadata?.likes)
                         ? post?.publishedPost?.metadata?.likes?.length
@@ -154,7 +175,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
                   </Button>
                   <Button variant='outline' className='flex-1'>
                     <MessageCircle className='mr-2 size-4' />
-                    Comment
+                    {t('comment')}
                     <Badge variant='default' className='ml-2 rounded-md'>
                       {Array.isArray(post?.publishedPost?.metadata?.comments)
                         ? post?.publishedPost?.metadata?.comments?.length
@@ -164,7 +185,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
                   {post.platform !== Platform.X && (
                     <Button variant='outline' className='flex-1'>
                       <Share2 className='mr-2 size-4' />
-                      Share
+                      {t('share')}
                       <Badge variant='default' className='ml-2 rounded-md'>
                         {post?.publishedPost?.metadata?.shares?.length ?? 0}
                       </Badge>
@@ -173,7 +194,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
                   {post.platform === Platform.X && (
                     <Button variant='outline' className='flex-1'>
                       <FaRetweet className='mr-2 size-4' />
-                      Retweet
+                      {t('retweet')}
                       <Badge variant='default' className='ml-2 rounded-md'>
                         {post?.publishedPost?.metadata?.retweets ?? 0}
                       </Badge>
@@ -184,7 +205,7 @@ export default function PostDetails({ post }: PostDetailsProps) {
             </Card>
           </ElementEffect>
 
-          {renderComment(post)}
+          {renderComment(post, t, dateFnsLocale)}
         </div>
       </div>
     </div>
