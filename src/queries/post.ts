@@ -31,11 +31,7 @@ export const useUpdatePostMutation = (id: string) => {
 }
 
 export const useDeletePostMutation = () => {
-  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => postApi.deletePost(id),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['posts'] })
-    }
+    mutationFn: (id: string) => postApi.deletePost(id)
   })
 }

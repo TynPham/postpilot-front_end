@@ -8,6 +8,8 @@ import { FADE_IN_ANIMATION, FADE_IN_STAGGER_ANIMATION, fadeInChildVariants } fro
 import { POST_STATUS, PostStatus, PostType } from '@/constants/post'
 import { useAppContext } from '@/contexts/app-context'
 import { useDeletePostMutation } from '@/queries/post'
+import { useDeleteRecurringInstanceMutation, useDeleteRecurringMutation } from '@/queries/recurring'
+import { useQueryClient } from '@tanstack/react-query'
 import { format } from 'date-fns'
 import { enUS, vi } from 'date-fns/locale'
 import { Clock, Loader2, MoreVertical, Trash2 } from 'lucide-react'
@@ -45,53 +47,91 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import ElementEffect from '@/components/effects/element-effect'
 import ElementEffectStagger from '@/components/effects/element-effect-stagger'
 
-import CreatePostModal from '../../schedules/create-post-modal'
 import EmptyPost from './empty-post'
 
 export function PostList({
   status,
-  postsPromise,
-  platform,
-  accessToken
+  posts,
+  platform
 }: {
   status: PostStatus
-  postsPromise: Promise<SuccessResponse<Post[]>>
+  posts: Post[]
   platform: (typeof PLATFORM_TYPE)[keyof typeof PLATFORM_TYPE]
-  accessToken: string
 }) {
-  const postResolve = use(postsPromise)
+  const t = useTranslations('posts')
 
-  const [posts, setPosts] = useState<SuccessResponse<Post[]>>(
-    postResolve ?? {
-      data: [],
-      message: 'Success'
-    }
-  )
-
-  const scheduledPosts = posts?.data.filter((post) => post.status === status)
+  const filteredPosts = posts?.filter((post) => post.status === status)
 
   const deletePostMutation = useDeletePostMutation()
+  const deleteRecurringInstanceMutation = useDeleteRecurringInstanceMutation()
+  const deleteRecurringMutation = useDeleteRecurringMutation()
 
+  const queryClient = useQueryClient()
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeletePost = async (post: Post) => {
     if (deletePostMutation.isPending) return
     try {
-      await deletePostMutation.mutateAsync(postId)
+      await deletePostMutation.mutateAsync(post.id)
       toast({
-        title: 'Success',
-        description: 'Delete Post Successfully!'
+        title: t('success'),
+        description: t('deletePostSuccess')
       })
       setIsModalOpen(false)
-      const updatedPosts = await postApi.getPostsServer(accessToken, { platform })
-      setPosts(updatedPosts.data)
+      queryClient.invalidateQueries({ queryKey: ['posts', platform] })
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto'
+      }, 0)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
+  const handleDeleteRecurringInstance = async (post: Post) => {
+    if (deleteRecurringInstanceMutation.isPending) return
+    try {
+      if (post.status === POST_STATUS.SCHEDULED) {
+        await deletePostMutation.mutateAsync(post.id)
+      } else {
+        await deleteRecurringInstanceMutation.mutateAsync({
+          id: post.recurringPostId as string,
+          publicationTime: post.publicationTime
+        })
+      }
+      toast({
+        title: t('success'),
+        description: t('deletePostSuccess')
+      })
+      setIsModalOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['posts', platform] })
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto'
+      }, 0)
+    } catch (error) {
+      handleErrorApi({ error })
+    }
+  }
+
+  const handleDeleteRecurring = async (post: Post) => {
+    if (deleteRecurringMutation.isPending) return
+    try {
+      await deleteRecurringMutation.mutateAsync(post.recurringPostId as string)
+      toast({
+        title: t('success'),
+        description: t('deleteRecurringSuccess')
+      })
+      setIsModalOpen(false)
+      queryClient.invalidateQueries({ queryKey: ['posts', platform] })
+      setTimeout(() => {
+        document.body.style.pointerEvents = 'auto'
+      }, 0)
     } catch (error) {
       handleErrorApi({ error })
     }
   }
 
   // Group posts by date
-  const groupedPosts = scheduledPosts?.reduce(
+  const groupedPosts = filteredPosts?.reduce(
     (groups, post) => {
       const date = format(post.publicationTime, 'yyyy-MM-dd')
 
@@ -106,11 +146,10 @@ export function PostList({
     {} as Record<string, Post[]>
   )
 
-  const t = useTranslations('posts')
-
   const locale = useLocale()
 
   const dateFnsLocale = locale === 'vi' ? vi : enUS
+
   return (
     <div className='space-y-8'>
       {groupedPosts &&
@@ -186,10 +225,13 @@ export function PostList({
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align='end'>
                               <DropdownMenuLabel>{t('actions')}</DropdownMenuLabel>
-                              <DropdownMenuItem>
-                                <Link href={`/posts/${post.platform}/${post.id}`}>{t('viewDetails')}</Link>
-                              </DropdownMenuItem>
-                              {post.status === POST_STATUS.SCHEDULED && (
+                              {post.status === POST_STATUS.PUBLISHED && (
+                                <DropdownMenuItem>
+                                  <Link href={`/posts/${post.platform}/${post.id}`}>{t('viewDetails')}</Link>
+                                </DropdownMenuItem>
+                              )}
+
+                              {post.status !== POST_STATUS.PUBLISHED && (
                                 <>
                                   <DropdownMenuItem>
                                     <Link href={`/schedules`}>{t('post')}</Link>
@@ -199,7 +241,6 @@ export function PostList({
                                   <DropdownMenuItem asChild>
                                     <AlertDialog open={isModalOpen} onOpenChange={setIsModalOpen}>
                                       <AlertDialogTrigger asChild>
-                                        {/* To make a button looks like dropdown menu item */}
                                         <Button
                                           size='sm'
                                           variant='ghost'
@@ -208,7 +249,6 @@ export function PostList({
                                           <Trash2 className='size-4' />
                                           {t('delete')}
                                         </Button>
-                                        {/* Show Dialog */}
                                       </AlertDialogTrigger>
                                       <AlertDialogContent>
                                         <AlertDialogHeader>
@@ -217,19 +257,60 @@ export function PostList({
                                         </AlertDialogHeader>
                                         <AlertDialogFooter>
                                           <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
-                                          <AlertDialogAction
-                                            disabled={deletePostMutation.isPending}
-                                            className={buttonVariants({ variant: 'destructive' })}
-                                            onClick={(e) => {
-                                              e.preventDefault()
-                                              handleDeletePost(post.id)
-                                            }}
-                                          >
-                                            {t('Continue')}
-                                            {deletePostMutation.isPending && (
-                                              <Loader2 className='size-4 animate-spin ml-2' />
-                                            )}
-                                          </AlertDialogAction>
+                                          {post.recurringPostId ? (
+                                            <>
+                                              <AlertDialogAction
+                                                disabled={
+                                                  post.status === POST_STATUS.SCHEDULED
+                                                    ? deletePostMutation.isPending
+                                                    : deleteRecurringInstanceMutation.isPending
+                                                }
+                                                className={buttonVariants({ variant: 'destructive' })}
+                                                onClick={(e) => {
+                                                  e.preventDefault()
+                                                  handleDeleteRecurringInstance(post)
+                                                }}
+                                              >
+                                                {post.status === POST_STATUS.SCHEDULED
+                                                  ? t('continue')
+                                                  : t('deleteSingle')}
+                                                {(post.status === POST_STATUS.SCHEDULED
+                                                  ? deletePostMutation.isPending
+                                                  : deleteRecurringInstanceMutation.isPending) && (
+                                                  <Loader2 className='size-4 animate-spin ml-2' />
+                                                )}
+                                              </AlertDialogAction>
+                                              {post.status === POST_STATUS.ACTIVE && (
+                                                <AlertDialogAction
+                                                  disabled={deleteRecurringMutation.isPending}
+                                                  className={buttonVariants({ variant: 'destructive' })}
+                                                  onClick={(e) => {
+                                                    e.preventDefault()
+                                                    handleDeleteRecurring(post)
+                                                  }}
+                                                >
+                                                  {t('deleteAll')}
+                                                  {deleteRecurringMutation.isPending && (
+                                                    <Loader2 className='size-4 animate-spin ml-2' />
+                                                  )}
+                                                </AlertDialogAction>
+                                              )}
+                                            </>
+                                          ) : (
+                                            <AlertDialogAction
+                                              disabled={deletePostMutation.isPending}
+                                              className={buttonVariants({ variant: 'destructive' })}
+                                              onClick={(e) => {
+                                                e.preventDefault()
+                                                handleDeletePost(post)
+                                              }}
+                                            >
+                                              {t('continue')}
+                                              {deletePostMutation.isPending && (
+                                                <Loader2 className='size-4 animate-spin ml-2' />
+                                              )}
+                                            </AlertDialogAction>
+                                          )}
                                         </AlertDialogFooter>
                                       </AlertDialogContent>
                                     </AlertDialog>

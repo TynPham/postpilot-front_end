@@ -28,13 +28,13 @@ export default function TelegramBot() {
       })
       toast({
         title: 'Success',
-        description: res.data.message ?? 'Telegram connected successfully'
+        description: res.data.message ?? t('telegramConnected')
       })
       await refetch()
     } catch (error) {
       toast({
         title: 'Error',
-        description: 'Failed to connect Telegram'
+        description: t('telegramFailed')
       })
     }
   }

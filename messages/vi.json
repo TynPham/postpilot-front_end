@@ -94,6 +94,8 @@
     "exportPDF": "Xuất dưới dạng PDF"
   },
   "schedules": {
+    "error": "Lỗi",
+    "pastSchedule": "Không thể lên lịch bài đăng trong quá khứ",
     "next": "Tiếp theo",
     "previous": "Trước đó",
     "today": "Hôm nay",
@@ -127,21 +129,28 @@
     "edit": "EditPost",
     "delete": "Xóa",
     "confirmTitle": "Bạn có hoàn toàn chắc chắn không?",
-    "confirmDescription": "Hành động này không thể hoàn tác. Nó sẽ xóa vĩnh viễn tài khoản và dữ liệu của bạn khỏi máy chủ của chúng tôi.",
+    "confirmDescription": "Hành động này không thể hoàn tác. Nó sẽ xóa vĩnh viễn bài đăng của bạn.",
     "cancel": "Hủy",
-    "Continue": "continue",
+    "continue": "Tiếp tục",
     "like": "Thích",
     "comment": "Bình luận",
     "share": "Chia sẻ",
     "retweet": "Retweet",
     "comments": "Bình luận",
-    "at": "lúc"
+    "at": "lúc",
+    "deletePostSuccess": "Xóa bài đăng thành công!",
+    "success": "Thành công",
+    "deleteRecurringSuccess": "Xóa bài đăng định kỳ thành công!",
+    "deleteSingle": "Xóa một",
+    "deleteAll": "Xóa tất cả"
   },
   "connect": {
     "title": "Kết nối nền tảng",
     "description": "Kết nối các nền tảng mạng xã hội để quản lý bài đăng của bạn",
     "noConnectedPlatform": "Chưa có tài khoản được kết nối. Nhấn nút bên trên để kết nối tài khoản.",
-    "connectAccount": "Kết nối tài khoản"
+    "connectAccount": "Kết nối tài khoản",
+    "success": "Thành công",
+    "disconnectSuccess": "Tài khoản đã được ngắt kết nối thành công"
   },
   "subscription": {
     "title": "Bảng giá",
@@ -191,7 +200,12 @@
     "dailySummaryDes": "Nhận bản tóm tắt hàng ngày về hiệu suất bài đăng của bạn",
     "telegramHelp": "Trợ giúp Telegram",
     "connected": "Đã kết nối",
-    "notConnected": "Chưa kết nối"
+    "notConnected": "Chưa kết nối",
+    "telegramConnected": "Kết nối Telegram thành công",
+    "telegramFailed": "Không thể kết nối Telegram",
+    "hashtagDeleted": "Hashtag đã được xóa thành công",
+    "hashtagUpdated": "Hashtag đã được cập nhật thành công",
+    "hashtagCreated": "Hashtag đã được tạo thành công"
   },
   "createPostModal": {
     "title": "Lên lịch bài đăng",
@@ -259,7 +273,39 @@
     "updatePost": "Cập nhật bài đăng",
     "schedulePost": "Lên lịch bài đăng",
     "uploadImages": "Tải lên hình ảnh",
-    "pickDate": "Chọn ngày"
+    "pickDate": "Chọn ngày",
+    "updateRecurringPost": "Cập nhật bài đăng định kỳ",
+    "updateAllRecurring": "Cập nhật tất cả bài đăng định kỳ",
+    "updateSinglePost": "Cập nhật bài đăng",
+    "updateOptions": "Tùy chọn cập nhật",
+    "characterLimit": "Giới hạn ký tự",
+    "characters": "ký tự",
+    "overLimit": "Nội dung vượt quá giới hạn ký tự cho một trong các nền tảng đã chọn!",
+    "selectAtLeastOnePage": "Vui lòng chọn ít nhất một trang",
+    "instagramNote": "Bài đăng Instagram yêu cầu ít nhất một hình ảnh",
+    "pastSchedule": "Không thể lên lịch bài đăng trong quá khứ",
+    "postScheduled": "Bài đăng đã được lên lịch thành công",
+    "selectAtLeastOneDay": "Vui lòng chọn ít nhất một ngày trong tuần",
+    "recurringScheduleCreated": "Lịch định kỳ đã được tạo thành công",
+    "postUpdated": "Bài đăng đã được cập nhật thành công",
+    "allRecurringPostsUpdated": "Tất cả bài đăng định kỳ đã được cập nhật thành công",
+    "descriptionRequired": "Mô tả là bắt buộc",
+    "dateRequired": "Ngày là bắt buộc",
+    "timeRequired": "Thời gian là bắt buộc",
+    "hashtagManager": "Quản lý Hashtag",
+    "searchHashtags": "Tìm kiếm Hashtag",
+    "createHashtag": "Tạo Hashtag mới",
+    "editHashtag": "Chỉnh sửa Hashtag",
+    "deleteHashtag": "Xóa Hashtag",
+    "noHashtagsFound": "Không tìm thấy Hashtag",
+    "noHashtagsYet": "Không có Hashtag",
+    "name": "Tên",
+    "hashtags": "Hashtag",
+    "hashtagsPlaceholder": "Nhập và nhấn Enter để thêm Hashtag",
+    "hashtagsNote": "Nhấn space, Enter hoặc dấu phẩy để thêm Hashtag. Nhấn Backspace để xóa Hashtag cuối cùng.",
+    "color": "Màu sắc",
+    "save": "Lưu",
+    "update": "Cập nhật"
   },
   "settings": {
     "title": "Cài đặt",
@@ -325,5 +371,13 @@
     "spanish": "Tiếng Tây Ban Nha",
     "edit": "Chỉnh sửa",
     "enterprisePlanPrice": "{value}.000 VNĐ"
+  },
+  "navUser": {
+    "loggingOut": "Đang đăng xuất...",
+    "pleaseWait": "Vui lòng chờ trong khi chúng tôi đăng xuất bạn.",
+    "upgradeToPro": "Nâng cấp lên Pro",
+    "account": "Tài khoản",
+    "billing": "Thanh toán",
+    "logout": "Đăng xuất"
   }
 }

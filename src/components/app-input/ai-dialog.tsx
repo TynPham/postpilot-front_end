@@ -10,7 +10,7 @@ import {
   Sparkles,
   SpellCheck
 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { flushSync } from 'react-dom'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -41,6 +41,7 @@ type Action =
 
 // Custom Hook
 const useAIDialog = (onContentChange: (text: string) => void, text?: string) => {
+  const locale = useLocale()
   const initialState: State = {
     open: false,
     step: 1,
@@ -75,6 +76,7 @@ const useAIDialog = (onContentChange: (text: string) => void, text?: string) => 
     Specific Hashtags: #Lunaria, #Candle
     User Description: ${settings.userDescription}
     Post Topic: ${settings.responseFormat}
+    Language: ${locale}
   `
 
   const generatePromptWithSettings = (action: string, content: string) => `
@@ -84,6 +86,7 @@ const useAIDialog = (onContentChange: (text: string) => void, text?: string) => 
     Use Emojis: ${state.settings.isUseEmoji ? 'Yes' : 'No'}
     Use Hashtags: ${state.settings.isUseHashtags ? 'Yes' : 'No'}
     Specific Hashtags: #Lunaria, #Candle
+    Language: ${locale}
   `
 
   const handleOpenChange = (isOpen: boolean) => {

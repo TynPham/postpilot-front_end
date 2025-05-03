@@ -69,8 +69,8 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
   const handleSelectSlot = ({ start, end }: SlotInfo) => {
     if (moment(start).isBefore(moment(), 'minute')) {
       toast({
-        title: 'Error',
-        description: 'You cannot schedule posts in the past',
+        title: t('error'),
+        description: t('pastSchedule'),
         variant: 'destructive'
       })
       return

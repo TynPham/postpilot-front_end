@@ -70,8 +70,8 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
     try {
       const res = await disconnectSocialAccount(accountId)
       toast({
-        title: 'Success',
-        description: res.data.message
+        title: t('success'),
+        description: t('disconnectSuccess')
       })
     } catch (error) {
       handleErrorApi({

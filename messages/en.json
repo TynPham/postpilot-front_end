@@ -94,6 +94,8 @@
     "exportPDF": "Export as PDF"
   },
   "schedules": {
+    "error": "Error",
+    "pastSchedule": "You cannot schedule posts in the past",
     "next": "Next",
     "previous": "Previous",
     "today": "Today",
@@ -127,21 +129,28 @@
     "edit": "EditPost",
     "delete": "Delete",
     "confirmTitle": "Are you absolutely sure?",
-    "confirmDescription": "This action cannot be undone. This will permanently delete your account and remove your data from our servers.",
+    "confirmDescription": "This action cannot be undone. This will permanently delete your post.",
     "cancel": "Cancel",
-    "Continue": "continue",
+    "continue": "Continue",
     "like": "Like",
     "comment": "Comment",
     "share": "Share",
     "retweet": "Retweet",
     "comments": "Comments",
-    "at": "at"
+    "at": "at",
+    "deletePostSuccess": "Delete Post Successfully!",
+    "success": "Success",
+    "deleteRecurringSuccess": "Delete Recurring Post Successfully!",
+    "deleteSingle": "Delete Single",
+    "deleteAll": "Delete All"
   },
   "connect": {
     "title": "Connect Platforms",
     "description": "Connect social platforms to manage your posts",
     "noConnectedPlatform": "No accounts connected. Click the button above to connect an account.",
-    "connectAccount": "Connect Account"
+    "connectAccount": "Connect Account",
+    "success": "Success",
+    "disconnectSuccess": "Account disconnected successfully"
   },
   "subscription": {
     "title": "Pricing",
@@ -191,7 +200,12 @@
     "dailySummaryDes": "Receive a daily summary of your posts performance",
     "telegramHelp": "Telegram Help",
     "connected": "Connected",
-    "notConnected": "Not Connected"
+    "notConnected": "Not Connected",
+    "telegramConnected": "Telegram connected successfully",
+    "telegramFailed": "Failed to connect Telegram",
+    "hashtagDeleted": "Hashtag deleted successfully",
+    "hashtagUpdated": "Hashtag updated successfully",
+    "hashtagCreated": "Hashtag created successfully"
   },
   "createPostModal": {
     "title": "Schedule Post",
@@ -259,7 +273,39 @@
     "updatePost": "Update Post",
     "schedulePost": "Schedule Post",
     "uploadImages": "Upload Images",
-    "pickDate": "Pick a date"
+    "pickDate": "Pick a date",
+    "updateRecurringPost": "Update Recurring Post",
+    "updateAllRecurring": "Update All Recurring Posts",
+    "updateSinglePost": "Update Single Post",
+    "updateOptions": "Update Options",
+    "characterLimit": "Character Limit",
+    "characters": "characters",
+    "overLimit": "Content exceeds the character limit for the selected platform",
+    "selectAtLeastOnePage": "Please select at least one page",
+    "instagramNote": "Instagram posts require at least one image",
+    "pastSchedule": "You cannot schedule posts in the past",
+    "postScheduled": "Post has been scheduled successfully",
+    "selectAtLeastOneDay": "Please select at least one day in the week",
+    "recurringScheduleCreated": "Recurring schedule has been created successfully",
+    "postUpdated": "Post has been updated successfully",
+    "allRecurringPostsUpdated": "All recurring posts have been updated successfully",
+    "descriptionRequired": "Description is required",
+    "dateRequired": "Date is required",
+    "timeRequired": "Time is required",
+    "hashtagManager": "Hashtag Manager",
+    "searchHashtags": "Search hashtags",
+    "createHashtag": "Create new hashtags",
+    "editHashtag": "Edit hashtag",
+    "deleteHashtag": "Delete hashtag",
+    "noHashtagsFound": "No hashtags found",
+    "noHashtagsYet": "No hashtags yet",
+    "name": "Name",
+    "hashtags": "Hashtags",
+    "hashtagsPlaceholder": "Type and press enter to add hashtags",
+    "hashtagsNote": "Press space, enter, or comma to add a hashtag. Press backspace to remove the last tag.",
+    "color": "Color",
+    "save": "Save",
+    "update": "Update"
   },
   "settings": {
     "title": "Settings",
@@ -325,5 +371,13 @@
     "spanish": "Spanish",
     "edit": "Edit",
     "enterprisePlanPrice": "${value}.00"
+  },
+  "navUser": {
+    "loggingOut": "Logging out...",
+    "pleaseWait": "Please wait while we log you out.",
+    "upgradeToPro": "Upgrade to Pro",
+    "account": "Account",
+    "billing": "Billing",
+    "logout": "Logout"
   }
 }

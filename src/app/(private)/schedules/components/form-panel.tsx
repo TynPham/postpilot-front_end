@@ -1,8 +1,9 @@
-import { PostType } from '@/constants/post'
+import { CHARACTER_LIMITS, PostType } from '@/constants/post'
 import { PostSchema } from '@/schema-validations/post'
+import { toCapitalize } from '@/utils/utils'
 import { addMonths, format, isAfter, isBefore } from 'date-fns'
 import { enUS, vi } from 'date-fns/locale'
-import { Calendar, CalendarIcon, Upload } from 'lucide-react'
+import { Calendar, CalendarIcon, Info, Upload } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
 import { DateRange } from 'react-day-picker'
 import { UseFormReturn } from 'react-hook-form'
@@ -19,14 +20,18 @@ import { Label } from '@/components/ui/label'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Switch } from '@/components/ui/switch'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import AppInput from '@/components/app-input'
 
 interface FormPanelProps {
   form: UseFormReturn<PostSchema>
   onImageUpload: (e: React.ChangeEvent<HTMLInputElement>) => void
+  isEdit?: boolean
+  isRecurringPost?: boolean
+  updateType?: string
 }
 
-export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
+export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, updateType }: FormPanelProps) => {
   const t = useTranslations('createPostModal')
 
   const weekdays = [
@@ -83,8 +88,31 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
             name='description'
             render={({ field }) => (
               <FormItem>
-                <FormLabel>
-                  {t('description')} <span className='text-red-500'>*</span>
+                <FormLabel className='flex items-center justify-between'>
+                  <div>
+                    {t('description')} <span className='text-red-500'>*</span>
+                  </div>
+                  <TooltipProvider delayDuration={100}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <span className='ml-1 cursor-pointer align-middle'>
+                          <Info className='inline size-4 text-muted-foreground' />
+                        </span>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <div>
+                          <div className='font-semibold mb-1'>{t('characterLimit')}:</div>
+                          <ul className='list-disc list-inside pl-1'>
+                            {Object.entries(CHARACTER_LIMITS).map(([key, value]) => (
+                              <li key={key}>
+                                {toCapitalize(key)}: {value} {t('characters')}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
                 </FormLabel>
                 <FormControl>
                   <AppInput field={field} />
@@ -148,9 +176,10 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                           className={cn(
                             'pl-3 text-left font-normal flex w-full',
                             !field.value && 'text-muted-foreground',
-                            isRecurring && 'opacity-50 cursor-not-allowed'
+                            (isRecurring || (isEdit && isRecurringPost && updateType === 'single')) &&
+                              'opacity-50 cursor-not-allowed'
                           )}
-                          disabled={isRecurring}
+                          disabled={isRecurring || (isEdit && isRecurringPost && updateType === 'single')}
                         >
                           {field.value ? format(field.value, 'MM/dd/yyyy', { locale: dateFnsLocale }) : t('pickDate')}
                           <Calendar className='ml-auto size-4 opacity-50' />
@@ -164,7 +193,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                         selected={field.value}
                         onSelect={field.onChange}
                         initialFocus
-                        disabled={(date) => isBefore(date, new Date())}
+                        disabled={(date) => isBefore(date, new Date(new Date().setHours(0, 0, 0, 0)))}
                       />
                     </PopoverContent>
                   </Popover>
@@ -179,22 +208,25 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
               name='scheduledTime'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>
-                    <div className='flex items-center justify-end space-x-2'>
-                      <Label htmlFor='recurring-toggle' className='text-sm'>
-                        {t('recurring')}
-                      </Label>
-                      <FormField
-                        control={form.control}
-                        name='isRecurring'
-                        render={({ field }) => (
-                          <Switch id='recurring-toggle' checked={field.value} onCheckedChange={field.onChange} />
-                        )}
-                      />
-                    </div>
-                  </FormLabel>
+                  <div className='flex items-center justify-end space-x-2'>
+                    <Label htmlFor='recurring-toggle' className='text-sm'>
+                      {t('recurring')}
+                    </Label>
+                    <FormField
+                      control={form.control}
+                      name='isRecurring'
+                      render={({ field }) => (
+                        <Switch
+                          id='recurring-toggle'
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                          disabled={isEdit && isRecurringPost && updateType === 'single'}
+                        />
+                      )}
+                    />
+                  </div>
                   <FormControl>
-                    <Input type='time' {...field} />
+                    <Input type='time' {...field} disabled={isEdit && isRecurringPost && updateType === 'single'} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -209,14 +241,23 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
             render={({ field }) => (
               <div>
                 {field.value && (
-                  <div className='border rounded-md p-4 space-y-4'>
+                  <div
+                    className={cn('border rounded-md p-4 space-y-4', {
+                      'opacity-50 cursor-not-allowed': isEdit && isRecurringPost && updateType === 'single'
+                    })}
+                  >
                     <Label className='text-sm font-medium block'>{t('recurringSchedule')}</Label>
 
                     <FormField
                       control={form.control}
                       name='recurringType'
                       render={({ field }) => (
-                        <RadioGroup value={field.value} onValueChange={field.onChange} className='space-y-2'>
+                        <RadioGroup
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          className='space-y-2'
+                          disabled={isEdit && isRecurringPost && updateType === 'single'}
+                        >
                           <div className='flex items-center space-x-2'>
                             <RadioGroupItem value='daily' id='daily' />
                             <Label htmlFor='daily'>{t('daily')}</Label>
@@ -327,7 +368,7 @@ export const FormPanel = ({ form, onImageUpload }: FormPanelProps) => {
                                 }}
                                 numberOfMonths={2}
                                 disabled={(date) => {
-                                  if (isBefore(date, new Date())) {
+                                  if (isBefore(date, new Date(new Date().setHours(0, 0, 0, 0)))) {
                                     return true
                                   }
 
