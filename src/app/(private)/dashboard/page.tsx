@@ -51,7 +51,7 @@ export default async function DashboardPage() {
         <h1 className='text-2xl font-bold'>{t('title')}</h1>
 
         <div className='flex items-center gap-2'>
-          <Select value='last-7-days'>
+          {/* <Select value='last-7-days'>
             <SelectTrigger className='w-[180px] border-foreground'>
               <SelectValue placeholder='Select date range' />
             </SelectTrigger>
@@ -63,7 +63,7 @@ export default async function DashboardPage() {
               <SelectItem value='this-month'>{t('thisMonth')}</SelectItem>
               <SelectItem value='last-month'>{t('lastMonth')}</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
 
           <Export />
         </div>
@@ -154,9 +154,9 @@ export default async function DashboardPage() {
                 <TabsTrigger value='threads' className='flex-1'>
                   Threads
                 </TabsTrigger>
-                <TabsTrigger value='reddit' className='flex-1'>
+                {/* <TabsTrigger value='reddit' className='flex-1'>
                   Reddit
-                </TabsTrigger>
+                </TabsTrigger> */}
               </TabsList>
               <TabsContent value='facebook'>
                 <EngagementMetricsChart
@@ -182,12 +182,12 @@ export default async function DashboardPage() {
                   data={statisticalData.data.data.engagementData.threadsEngagementData}
                 />
               </TabsContent>
-              <TabsContent value='reddit'>
+              {/* <TabsContent value='reddit'>
                 <EngagementMetricsChart
                   platform={Platform.REDDIT}
                   data={statisticalData.data.data.engagementData.redditEngagementData}
                 />
-              </TabsContent>
+              </TabsContent> */}
             </Tabs>
           </CardContent>
         </Card>
@@ -214,8 +214,13 @@ export default async function DashboardPage() {
           <Separator />
           <div className='space-y-4'>
             {Object.entries(statisticalData.data.data.postsByPlatform).map(([platform, count]) => {
+              if (platform === 'reddit') {
+                return null
+              }
               const PlatformIcon = getIconPlatform(platform) as IconType
-              const percentage = (count / statisticalData.data.data.overallMetrics.totalPosts) * 100
+              const totalPosts = statisticalData.data.data.overallMetrics.totalPosts || 1
+              const percentage = (count / totalPosts) * 100
+
               return (
                 <div key={platform} className='flex items-center'>
                   <div

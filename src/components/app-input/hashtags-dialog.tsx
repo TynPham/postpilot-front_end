@@ -138,7 +138,7 @@ const TwoStepPopover = ({ onAddHashtags }: Props) => {
       <PopoverTrigger asChild>
         <Hash className='size-5' />
       </PopoverTrigger>
-      <PopoverContent className='w-[600px] max-h-[450px] overflow-y-auto' align='start'>
+      <PopoverContent className='w-full lg:w-[600px] max-h-[450px] overflow-y-auto w-parent-full' align='start'>
         <div className='flex justify-between items-center w-full mb-4'>
           <ArrowLeft onClick={() => setStep(1)} className={`size-4 cursor-pointer ${step === 1 && 'opacity-0'}`} />
           <span className='text-center font-bold text-xl'>

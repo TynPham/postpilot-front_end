@@ -366,7 +366,7 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
     if (post?.status === 'published') return
 
     const scheduledDate = moment(data.scheduledDate).format('YYYY-MM-DD')
-    const body = {
+    const body: any = {
       publicationTime: moment(`${scheduledDate} ${data.scheduledTime}`).utc().format('YYYY-MM-DDTHH:mm:ss[Z]'),
       metadata: {
         ...socialPosts[0].metadata
@@ -439,6 +439,9 @@ export default function CreatePostModal({ open, setOpen, credentials, time }: Cr
       })
     } else {
       // Case 2: Update single post in recurring series
+      if (post.id && !post.id.startsWith('recurring')) {
+        body.postId = post.id
+      }
       await updateRecurringInstanceMutation.mutateAsync({
         ...body
       })

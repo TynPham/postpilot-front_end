@@ -19,7 +19,7 @@ export const CredentialsPanel = ({ form, credentials, onScheduleAll }: Credentia
   const t = useTranslations('createPostModal')
   return (
     <div className='lg:w-64 border-r'>
-      <div className='p-6'>
+      <div className='px-2 md:px-6 py-6'>
         <FormField
           control={form.control}
           name='scheduleAll'

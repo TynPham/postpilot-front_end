@@ -5,6 +5,7 @@ import {
   ArrowDownWideNarrow,
   ArrowLeft,
   ArrowUpWideNarrow,
+  Info,
   RefreshCcw,
   Settings,
   Sparkles,
@@ -17,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 
 import { Button } from '../ui/button'
 import { Textarea } from '../ui/textarea'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import AiSetting from './ai-setting'
 
 // Types
@@ -239,7 +241,7 @@ const ActionButtons = ({
 
 const Disclaimer = () => {
   const t = useTranslations('createPostModal')
-  return <span className='text-gray-500 text-xs italic mt-6 inline-block'>{t('aiNote')}</span>
+  return <div className='text-gray-500 text-xs italic'>{t('aiNote')}</div>
 }
 
 // Main Component
@@ -263,7 +265,7 @@ const AIDialog = ({ onContentChange, text }: Props) => {
       <PopoverTrigger asChild>
         <Sparkles className='text-yellow-400 size-5' />
       </PopoverTrigger>
-      <PopoverContent className='w-[600px]' align='start' side={state.step === 1 ? 'bottom' : 'right'}>
+      <PopoverContent className='w-full lg:w-[600px] w-parent-full' align='start'>
         <div className='flex justify-between items-center w-full mb-4'>
           <ArrowLeft
             onClick={() => dispatch({ type: 'SET_STEP', payload: 1 })}
@@ -279,7 +281,19 @@ const AIDialog = ({ onContentChange, text }: Props) => {
         <div className='py-2'>
           {state.step === 1 ? (
             <div className='space-y-3'>
-              <p className='font-semibold'>{t('aiDescription')}</p>
+              <div className='flex items-center justify-between gap-2'>
+                <p className='font-semibold'>{t('aiDescription')}</p>
+                <div className='lg:hidden'>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Info className='inline size-4 text-muted-foreground' />
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Disclaimer />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </div>
               <Textarea
                 onChange={(e) => dispatch({ type: 'UPDATE_SETTINGS', payload: { userDescription: e.target.value } })}
                 placeholder={t('example')}
@@ -294,7 +308,9 @@ const AIDialog = ({ onContentChange, text }: Props) => {
                 isGenerating={isGenerating}
                 hasGeneratedContent={!!state.generatedContent}
               />
-              <Disclaimer />
+              <div className='hidden lg:block'>
+                <Disclaimer />
+              </div>
             </div>
           ) : (
             <AiSetting

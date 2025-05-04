@@ -51,7 +51,7 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
 
   return (
     <div className='flex-1'>
-      <div className='p-6 max-h-[calc(90vh-48px)] overflow-y-auto scrollbar-none'>
+      <div className='px-2 md:px-6 py-6 max-h-[calc(90vh-48px)] overflow-y-auto scrollbar-none'>
         <div className='space-y-6'>
           <FormField
             control={form.control}
@@ -62,7 +62,12 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                   {t('type')} <span className='text-red-500'>*</span>
                 </FormLabel>
                 <FormControl>
-                  <RadioGroup onValueChange={field.onChange} value={field.value} className='flex flex-wrap gap-4'>
+                  <RadioGroup
+                    onValueChange={field.onChange}
+                    value={field.value}
+                    className='flex flex-wrap gap-4'
+                    disabled={isEdit && isRecurringPost && updateType === 'all'}
+                  >
                     {Object.values(PostType).map((type) => (
                       <FormItem key={type}>
                         <FormControl>
@@ -70,7 +75,10 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                         </FormControl>
                         <FormLabel
                           htmlFor={type}
-                          className='flex items-center justify-center rounded-md border-2 border-muted bg-transparent px-6 py-2 hover:bg-muted peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer'
+                          className={cn(
+                            'flex items-center justify-center rounded-md border-2 border-muted bg-transparent px-6 py-2 hover:bg-muted peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary peer-data-[state=checked]:text-primary-foreground cursor-pointer',
+                            isEdit && isRecurringPost && updateType === 'all' && 'opacity-50 cursor-not-allowed'
+                          )}
                         >
                           {t(type).toUpperCase()}
                         </FormLabel>
@@ -92,15 +100,36 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                   <div>
                     {t('description')} <span className='text-red-500'>*</span>
                   </div>
-                  <TooltipProvider delayDuration={100}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <span className='ml-1 cursor-pointer align-middle'>
-                          <Info className='inline size-4 text-muted-foreground' />
-                        </span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <div>
+                  <div className='hidden lg:block'>
+                    <TooltipProvider delayDuration={100}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <span className='ml-1 cursor-pointer align-middle'>
+                            <Info className='inline size-4 text-muted-foreground' />
+                          </span>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <div>
+                            <div className='font-semibold mb-1'>{t('characterLimit')}:</div>
+                            <ul className='list-disc list-inside pl-1'>
+                              {Object.entries(CHARACTER_LIMITS).map(([key, value]) => (
+                                <li key={key}>
+                                  {toCapitalize(key)}: {value} {t('characters')}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  </div>
+                  <div className='lg:hidden'>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Info className='inline size-4 text-muted-foreground' />
+                      </PopoverTrigger>
+                      <PopoverContent>
+                        <div className='text-sm'>
                           <div className='font-semibold mb-1'>{t('characterLimit')}:</div>
                           <ul className='list-disc list-inside pl-1'>
                             {Object.entries(CHARACTER_LIMITS).map(([key, value]) => (
@@ -110,12 +139,12 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                             ))}
                           </ul>
                         </div>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
+                      </PopoverContent>
+                    </Popover>
+                  </div>
                 </FormLabel>
                 <FormControl>
-                  <AppInput field={field} />
+                  <AppInput field={field} disabled={isEdit && isRecurringPost && updateType === 'all'} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -132,7 +161,12 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                   render={({}) => (
                     <FormItem>
                       <FormControl>
-                        <Card className='border-dashed'>
+                        <Card
+                          className={cn(
+                            'border-dashed',
+                            isEdit && isRecurringPost && updateType === 'all' && 'opacity-50'
+                          )}
+                        >
                           <CardContent className='p-6'>
                             <Input
                               type='file'
@@ -141,10 +175,14 @@ export const FormPanel = ({ form, onImageUpload, isEdit, isRecurringPost, update
                               className='hidden'
                               onChange={onImageUpload}
                               id='image-upload'
+                              disabled={isEdit && isRecurringPost && updateType === 'all'}
                             />
                             <label
                               htmlFor='image-upload'
-                              className='cursor-pointer flex flex-col items-center justify-center py-6 bg-muted hover:bg-muted/80 rounded-md transition-colors'
+                              className={cn(
+                                'cursor-pointer flex flex-col items-center justify-center py-6 bg-muted hover:bg-muted/80 rounded-md transition-colors',
+                                isEdit && isRecurringPost && updateType === 'all' && 'opacity-50 cursor-not-allowed'
+                              )}
                             >
                               <Upload className='size-8 mb-2' />
                               <p className='text-sm text-muted-foreground'>{t('uploadImages')}</p>

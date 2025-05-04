@@ -48,7 +48,7 @@ export const PreviewPanel = ({
   const t = useTranslations('createPostModal')
   return (
     <div className='flex-1 border-l'>
-      <div className='p-6 flex flex-col justify-between h-full gap-4'>
+      <div className='px-2 md:px-6 py-6 flex flex-col justify-between h-full gap-4'>
         <h3 className='font-semibold text-lg'>{t('preview')}</h3>
         <div
           className={cn(' overflow-y-auto scrollbar-none', {

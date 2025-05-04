@@ -201,6 +201,7 @@ export default function Schedule({ credentials }: { credentials: Credential[] })
           yesterday: t('yesterday'),
           work_week: t('workWeek')
         }}
+        longPressThreshold={0}
       />
 
       <CreatePostModal
