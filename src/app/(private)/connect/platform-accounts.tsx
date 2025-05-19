@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { DEFAULT_NUMBER_OF_SKELETON } from '@/constants'
@@ -47,6 +48,8 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
   const t = useTranslations('connect')
   const btnTextConnect = t('connectAccount')
 
+  const [disconnectingAccountId, setDisconnectingAccountId] = useState<string | null>(null)
+
   const getPlatformButton = () => {
     switch (platformId) {
       case Platform.FACEBOOK:
@@ -62,12 +65,12 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
     }
   }
 
-  const { mutateAsync: disconnectSocialAccount, isPending: isDisconnecting } =
-    useDisconnectSocialAccountMutation(platformId)
+  const { mutateAsync: disconnectSocialAccount } = useDisconnectSocialAccountMutation(platformId)
 
   const handleDisconnect = async (accountId: string) => {
-    if (isDisconnecting) return
+    if (disconnectingAccountId) return
     try {
+      setDisconnectingAccountId(accountId)
       const res = await disconnectSocialAccount(accountId)
       toast({
         title: t('success'),
@@ -77,6 +80,8 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
       handleErrorApi({
         error
       })
+    } finally {
+      setDisconnectingAccountId(null)
     }
   }
 
@@ -121,9 +126,9 @@ export function PlatformAccounts({ platformId = Platform.FACEBOOK }: PlatformAcc
                     <Button
                       variant='destructive'
                       onClick={() => handleDisconnect(account.id)}
-                      disabled={isDisconnecting}
+                      disabled={disconnectingAccountId === account.id}
                     >
-                      {isDisconnecting && <Loader2 className='size-4 animate-spin mr-2' />}
+                      {disconnectingAccountId === account.id && <Loader2 className='size-4 animate-spin mr-2' />}
                       <Unlink />
                     </Button>
                   </div>
