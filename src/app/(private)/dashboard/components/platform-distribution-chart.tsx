@@ -37,16 +37,13 @@ const chartConfig = {
 
 export function PlatformDistributionChart({ data }: { data: Statistical['postsByPlatform'] }) {
   const hasZeroValues = Object.values(data).every((value) => value === 0)
-  const chartData = Object.entries(data).map(([platform, count]) => {
-    if (platform === 'reddit') {
-      return null
-    }
-    return {
+  const chartData = Object.entries(data)
+    .filter(([platform]) => platform in chartConfig)
+    .map(([platform, count]) => ({
       name: platform,
       value: count,
       fill: chartConfig[platform as keyof typeof chartConfig].color
-    }
-  })
+    }))
 
   const chartRef = useRef<HTMLDivElement>(null)
 

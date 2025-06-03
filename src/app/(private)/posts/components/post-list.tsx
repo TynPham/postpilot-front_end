@@ -62,7 +62,7 @@ export function PostList({
 
   const filteredPosts = posts?.filter((post) => post.status === status)
 
-  const deletePostMutation = useDeletePostMutation()
+  const deletePostMutation = useDeletePostMutation({ platform })
   const deleteRecurringInstanceMutation = useDeleteRecurringInstanceMutation()
   const deleteRecurringMutation = useDeleteRecurringMutation()
 

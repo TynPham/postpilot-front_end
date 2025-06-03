@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import postApi, { GetPostsParams } from '@/apis/posts.api'
+import { PLATFORM_TYPE } from '@/constants'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 
 export const useGetPosts = (params?: GetPostsParams) => {
@@ -30,8 +31,12 @@ export const useUpdatePostMutation = (id: string) => {
   })
 }
 
-export const useDeletePostMutation = () => {
+export const useDeletePostMutation = (params?: GetPostsParams) => {
+  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (id: string) => postApi.deletePost(id)
+    mutationFn: (id: string) => postApi.deletePost(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['posts', params] })
+    }
   })
 }
